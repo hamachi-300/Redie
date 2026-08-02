@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float walkSpeed = 5f;
+    [SerializeField] private float runSpeed = 10f;
 
     [Header("Status Settings")]
     [SerializeField] private float maxStamina = 100f;
@@ -19,7 +20,9 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb2d;
     private float remainHAHT;
     private float currentStamina;
-
+    private float currentSpeed;
+    
+    private Animator animator;
 
     // getters
     public float CurrentStamina => currentStamina;
@@ -29,6 +32,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         if (rb2d == null) {
             Debug.LogError("Rigidbody2D component not found on the player GameObject");
         } else {
@@ -39,6 +43,7 @@ public class PlayerController : MonoBehaviour
 
         // define startup status
         currentStamina = maxStamina;
+        currentSpeed = walkSpeed;
     }
 
     // Update is called once per frame
@@ -51,8 +56,28 @@ public class PlayerController : MonoBehaviour
         Vector2 moveDirection = new Vector2(moveX, moveY);
 
         // movement
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            currentSpeed = runSpeed;
+            animator.speed = 1f;
+        }
+        else
+        {
+            currentSpeed = walkSpeed;
+            animator.speed = 0.5f;
+        }
         if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
-        if (rb2d != null) { rb2d.velocity = moveDirection * moveSpeed; }
+        if (rb2d != null) { rb2d.velocity = moveDirection * currentSpeed; }
+
+        // animation blend tree
+        bool isMoving = (moveDirection.sqrMagnitude > 0.01f);
+        animator.SetBool("IsMoving", isMoving);
+
+        if (isMoving)
+        {
+            animator.SetFloat("MoveX", moveDirection.x);
+            animator.SetFloat("MoveY", moveDirection.y);
+        }
 
         // regenerate stamina
         if (currentStamina < maxStamina)
