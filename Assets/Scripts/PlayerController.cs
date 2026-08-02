@@ -5,16 +5,23 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
-    [Tooltip("Speed of the player movement")]
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float heavyAttackHoldTime =  1f;
 
     private Rigidbody2D rb2d;
+    private float remainHAHT;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Get the Rigidbody2D component if it exists
         rb2d = GetComponent<Rigidbody2D>();
+        if (rb2d == null) {
+            Debug.LogError("Rigidbody2D component not found on the player GameObject");
+        } else {
+            // make player not rotate and no gravity
+            rb2d.gravityScale = 0f;
+            rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
     }
 
     // Update is called once per frame
@@ -24,24 +31,27 @@ public class PlayerController : MonoBehaviour
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
 
-        // Combine inputs into a direction vector
         Vector2 moveDirection = new Vector2(moveX, moveY);
 
-        // Normalize direction vector to prevent faster diagonal movement
-        if (moveDirection.sqrMagnitude > 1f)
-        {
-            moveDirection.Normalize();
-        }
+        // movement
+        if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
+        if (rb2d != null) { rb2d.velocity = moveDirection * moveSpeed; }
 
-        // Apply movement
-        if (rb2d != null)
+        // attack type condition
+        if (Input.GetMouseButtonDown(0)) { remainHAHT = heavyAttackHoldTime; }
+        if (Input.GetMouseButton(0)) { remainHAHT -= Time.deltaTime; }
+
+        // light and heavy attack logic
+        if (Input.GetMouseButtonUp(0))
         {
-            rb2d.velocity = moveDirection * moveSpeed;
-        }
-        else
-        {
-            // Fallback for simple transform translation if there is no Rigidbody2D
-            transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
+            if (remainHAHT > 0)
+            {
+                Debug.Log("Light Attack!");
+            }
+            else
+            {
+                Debug.Log("Heavy Attack!");
+            }
         }
     }
 }
