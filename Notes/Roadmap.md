@@ -10,7 +10,7 @@
 
 - [ ] **Sprint A2: Core Attacking & Combat Feedback**
   - [x] Basic attack inputs (light and heavy attacks).
-  - Stamina consumption for attacks
+  - [x] Stamina consumption for attacks
   - Trigger collider-based weapon hitboxes.
   - Combat game feel elements: screen shake, knockback, and impact freeze.
 
