@@ -5,10 +5,11 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
-    [Tooltip("Speed of the player movement")]
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float heavyAttackHoldTime =  1f;
 
     private Rigidbody2D rb2d;
+    private float remainHAHT;
 
     // Start is called before the first frame update
     void Start()
@@ -32,14 +33,25 @@ public class PlayerController : MonoBehaviour
 
         Vector2 moveDirection = new Vector2(moveX, moveY);
 
-        if (moveDirection.sqrMagnitude > 1f)
-        {
-            moveDirection.Normalize();
-        }
+        // movement
+        if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
+        if (rb2d != null) { rb2d.velocity = moveDirection * moveSpeed; }
 
-        if (rb2d != null)
+        // attack type condition
+        if (Input.GetMouseButtonDown(0)) { remainHAHT = heavyAttackHoldTime; }
+        if (Input.GetMouseButton(0)) { remainHAHT -= Time.deltaTime; }
+
+        // light and heavy attack logic
+        if (Input.GetMouseButtonUp(0))
         {
-            rb2d.velocity = moveDirection * moveSpeed;
+            if (remainHAHT > 0)
+            {
+                Debug.Log("Light Attack!");
+            }
+            else
+            {
+                Debug.Log("Heavy Attack!");
+            }
         }
     }
 }
