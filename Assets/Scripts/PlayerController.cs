@@ -13,8 +13,14 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Get the Rigidbody2D component if it exists
         rb2d = GetComponent<Rigidbody2D>();
+        if (rb2d == null) {
+            Debug.LogError("Rigidbody2D component not found on the player GameObject");
+        } else {
+            // make player not rotate and no gravity
+            rb2d.gravityScale = 0f;
+            rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
     }
 
     // Update is called once per frame
@@ -24,24 +30,16 @@ public class PlayerController : MonoBehaviour
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
 
-        // Combine inputs into a direction vector
         Vector2 moveDirection = new Vector2(moveX, moveY);
 
-        // Normalize direction vector to prevent faster diagonal movement
         if (moveDirection.sqrMagnitude > 1f)
         {
             moveDirection.Normalize();
         }
 
-        // Apply movement
         if (rb2d != null)
         {
             rb2d.velocity = moveDirection * moveSpeed;
-        }
-        else
-        {
-            // Fallback for simple transform translation if there is no Rigidbody2D
-            transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
         }
     }
 }
