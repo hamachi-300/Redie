@@ -17,12 +17,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float staminaCostLightAttack = 10f;
     [SerializeField] private float staminaCostHeavyAttack = 20f;
 
-    private Rigidbody2D rb2d;
+    [Header("Weapon Settings")]
+    [SerializeField] private SpriteRenderer weaponVisualRenderer;
+
+    [Header("Equipped Weapon")]
+    [SerializeField] private WeaponData equippedWeapon;
+
     private float remainHAHT;
     private float currentStamina;
     private float currentSpeed;
     
+    private Rigidbody2D rb2d;
     private Animator animator;
+
 
     // getters
     public float CurrentStamina => currentStamina;
@@ -44,6 +51,15 @@ public class PlayerController : MonoBehaviour
         // define startup status
         currentStamina = maxStamina;
         currentSpeed = walkSpeed;
+
+        // start face direction south
+        animator.SetFloat("MoveX", 0f);
+        animator.SetFloat("MoveY", -1f); 
+
+        if (equippedWeapon != null)
+        {
+            EquipWeapon(equippedWeapon);
+        }
     }
 
     // Update is called once per frame
@@ -118,5 +134,37 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+
     }
+
+    public void EquipWeapon(WeaponData newWeapon)
+    {
+        if (newWeapon == null) return;
+
+        equippedWeapon = newWeapon;
+
+        // swap the sprite
+        if (weaponVisualRenderer != null)
+        {
+            weaponVisualRenderer.sprite = newWeapon.weaponSprite;
+            
+            // Apply custom scale for the weapon (e.g. Greatsword is larger)
+            weaponVisualRenderer.transform.localScale = newWeapon.localScale;
+        }
+
+        // swap the Animator Override Controller
+        if (animator != null && newWeapon.animatorOverride != null)
+        {
+            animator.runtimeAnimatorController = newWeapon.animatorOverride;
+        }
+
+        // update stats
+        staminaCostLightAttack = newWeapon.staminaCostLight;
+        staminaCostHeavyAttack = newWeapon.staminaCostHeavy;
+        
+        Debug.Log("Equipped: " + newWeapon.weaponName);
+    }
+
+
 }
