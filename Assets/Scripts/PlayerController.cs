@@ -75,12 +75,12 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             currentSpeed = runSpeed;
-            animator.speed = 1f;
+            animator.SetFloat("WalkAnimSpeed", 1f);
         }
         else
         {
             currentSpeed = walkSpeed;
-            animator.speed = 0.5f;
+            animator.SetFloat("WalkAnimSpeed", 0.5f);
         }
         if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
         if (rb2d != null) { rb2d.velocity = moveDirection * currentSpeed; }
@@ -102,6 +102,10 @@ public class PlayerController : MonoBehaviour
             currentStamina = Mathf.Min(currentStamina, maxStamina);
         }
 
+        // get direction of player facing
+        float facingX = animator.GetFloat("MoveX");
+        float facingY = animator.GetFloat("MoveY");
+
         // attack type condition
         if (Input.GetMouseButtonDown(0)) { remainHAHT = heavyAttackHoldTime; }
         if (Input.GetMouseButton(0)) { remainHAHT -= Time.deltaTime; }
@@ -114,6 +118,7 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostLightAttack)
                 {
                     Debug.Log("Light Attack!");
+                    animator.SetTrigger("LightAttack");
                     currentStamina -= staminaCostLightAttack;
                 }
                 else
@@ -126,6 +131,7 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostHeavyAttack)
                 {
                     Debug.Log("Heavy Attack!");
+                    animator.SetTrigger("HeavyAttack");
                     currentStamina -= staminaCostHeavyAttack;
                 }
                 else
@@ -134,8 +140,6 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-
-
     }
 
     public void EquipWeapon(WeaponData newWeapon)
@@ -165,6 +169,4 @@ public class PlayerController : MonoBehaviour
         
         Debug.Log("Equipped: " + newWeapon.weaponName);
     }
-
-
 }
