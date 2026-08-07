@@ -30,7 +30,6 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb2d;
     private Animator animator;
 
-
     // getters
     public float CurrentStamina => currentStamina;
     public float MaxStamina => maxStamina;
@@ -118,6 +117,8 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostLightAttack)
                 {
                     Debug.Log("Light Attack!");
+                    AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
+                    if (hitbox != null) hitbox.ResetHitbox();
                     animator.SetTrigger("LightAttack");
                     currentStamina -= staminaCostLightAttack;
                 }
@@ -131,6 +132,8 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostHeavyAttack)
                 {
                     Debug.Log("Heavy Attack!");
+                    AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
+                    if (hitbox != null) hitbox.ResetHitbox();
                     animator.SetTrigger("HeavyAttack");
                     currentStamina -= staminaCostHeavyAttack;
                 }
