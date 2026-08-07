@@ -17,12 +17,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float staminaCostLightAttack = 10f;
     [SerializeField] private float staminaCostHeavyAttack = 20f;
 
-    private Rigidbody2D rb2d;
+    [Header("Weapon Settings")]
+    [SerializeField] private SpriteRenderer weaponVisualRenderer;
+
+    [Header("Equipped Weapon")]
+    [SerializeField] private WeaponData equippedWeapon;
+
     private float remainHAHT;
     private float currentStamina;
     private float currentSpeed;
     
+    private Rigidbody2D rb2d;
     private Animator animator;
+
 
     // getters
     public float CurrentStamina => currentStamina;
@@ -44,6 +51,15 @@ public class PlayerController : MonoBehaviour
         // define startup status
         currentStamina = maxStamina;
         currentSpeed = walkSpeed;
+
+        // start face direction south
+        animator.SetFloat("MoveX", 0f);
+        animator.SetFloat("MoveY", -1f); 
+
+        if (equippedWeapon != null)
+        {
+            EquipWeapon(equippedWeapon);
+        }
     }
 
     // Update is called once per frame
@@ -59,12 +75,12 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             currentSpeed = runSpeed;
-            animator.speed = 1f;
+            animator.SetFloat("WalkAnimSpeed", 1f);
         }
         else
         {
             currentSpeed = walkSpeed;
-            animator.speed = 0.5f;
+            animator.SetFloat("WalkAnimSpeed", 0.5f);
         }
         if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
         if (rb2d != null) { rb2d.velocity = moveDirection * currentSpeed; }
@@ -86,6 +102,10 @@ public class PlayerController : MonoBehaviour
             currentStamina = Mathf.Min(currentStamina, maxStamina);
         }
 
+        // get direction of player facing
+        float facingX = animator.GetFloat("MoveX");
+        float facingY = animator.GetFloat("MoveY");
+
         // attack type condition
         if (Input.GetMouseButtonDown(0)) { remainHAHT = heavyAttackHoldTime; }
         if (Input.GetMouseButton(0)) { remainHAHT -= Time.deltaTime; }
@@ -98,6 +118,7 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostLightAttack)
                 {
                     Debug.Log("Light Attack!");
+                    animator.SetTrigger("LightAttack");
                     currentStamina -= staminaCostLightAttack;
                 }
                 else
@@ -110,6 +131,7 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostHeavyAttack)
                 {
                     Debug.Log("Heavy Attack!");
+                    animator.SetTrigger("HeavyAttack");
                     currentStamina -= staminaCostHeavyAttack;
                 }
                 else
@@ -118,5 +140,33 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void EquipWeapon(WeaponData newWeapon)
+    {
+        if (newWeapon == null) return;
+
+        equippedWeapon = newWeapon;
+
+        // swap the sprite
+        if (weaponVisualRenderer != null)
+        {
+            weaponVisualRenderer.sprite = newWeapon.weaponSprite;
+            
+            // Apply custom scale for the weapon (e.g. Greatsword is larger)
+            weaponVisualRenderer.transform.localScale = newWeapon.localScale;
+        }
+
+        // swap the Animator Override Controller
+        if (animator != null && newWeapon.animatorOverride != null)
+        {
+            animator.runtimeAnimatorController = newWeapon.animatorOverride;
+        }
+
+        // update stats
+        staminaCostLightAttack = newWeapon.staminaCostLight;
+        staminaCostHeavyAttack = newWeapon.staminaCostHeavy;
+        
+        Debug.Log("Equipped: " + newWeapon.weaponName);
     }
 }
