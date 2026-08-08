@@ -35,7 +35,8 @@ public class PlayerController : MonoBehaviour
     private float height = 0f;
     private float verticalVelocity = 0f;
     private bool isGrounded = true;
-    private bool isJumpAttacking = false;
+    private bool isChargingHeavy = false;
+
 
     private Rigidbody2D rb2d;
     private Animator animator;
@@ -119,32 +120,78 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0)) { remainHAHT = heavyAttackHoldTime; }
         if (Input.GetMouseButton(0)) { remainHAHT -= Time.deltaTime; }
 
-        // light and heavy attack logic
+        // reset heavy attack remain time when mouse down
+        if (Input.GetMouseButtonDown(0)) 
+        { 
+            remainHAHT = heavyAttackHoldTime; 
+            isChargingHeavy = false;
+        }
+
+        // held mouse for decrease remain heavy attack time and  enter charge stance
+        if (Input.GetMouseButton(0)) 
+        { 
+            remainHAHT -= Time.deltaTime; 
+
+            // Once held past 1 second -> Play Charge Pose!
+            if (remainHAHT <= 0f && !isChargingHeavy)
+            {
+                isChargingHeavy = true;
+                animator.SetBool("IsChargingHeavy", true);
+            }
+        }
+
+        // mouse released -> perform attack
         if (Input.GetMouseButtonUp(0))
         {
-            // jumping attack
+            // Airborne attack
             if (!isGrounded)
             {
                 if (currentStamina >= staminaCostLightAttack)
                 {
                     Debug.Log("Mid-Air Jump Attack!");
-                    isJumpAttacking = true;
                     AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
                     if (hitbox != null) hitbox.ResetHitbox();
                     animator.SetTrigger("LightAttack");
                     verticalVelocity -= 8f; 
                     currentStamina -= staminaCostLightAttack;
                 }
+                if (isChargingHeavy)
+                {
+                    animator.SetBool("IsChargingHeavy", false);
+                    isChargingHeavy = false;
+                }
             }
             else 
             {
-                if (remainHAHT > 0)
+                if (isChargingHeavy)
                 {
+                    // HEAVY ATTACK RELEASE SLAM
+                    if (currentStamina >= staminaCostHeavyAttack)
+                    {
+                        Debug.Log("Heavy Attack Release Slam!");
+                        AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
+                        if (hitbox != null) hitbox.ResetHitbox();
+
+                        animator.SetBool("IsChargingHeavy", false);
+                        animator.SetTrigger("HeavyAttack");
+                        currentStamina -= staminaCostHeavyAttack;
+                    }
+                    else
+                    {
+                        Debug.Log("Not enough stamina for heavy attack!");
+                        animator.SetBool("IsChargingHeavy", false);
+                    }
+                    isChargingHeavy = false;
+                }
+                else
+                {
+                    // LIGHT ATTACK (Released early)
                     if (currentStamina >= staminaCostLightAttack)
                     {
                         Debug.Log("Light Attack!");
                         AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
                         if (hitbox != null) hitbox.ResetHitbox();
+
                         animator.SetTrigger("LightAttack");
                         currentStamina -= staminaCostLightAttack;
                     }
@@ -153,23 +200,9 @@ public class PlayerController : MonoBehaviour
                         Debug.Log("Not enough stamina for light attack!");
                     }
                 }
-                else
-                {
-                    if (currentStamina >= staminaCostHeavyAttack)
-                    {
-                        Debug.Log("Heavy Attack!");
-                        AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
-                        if (hitbox != null) hitbox.ResetHitbox();
-                        animator.SetTrigger("HeavyAttack");
-                        currentStamina -= staminaCostHeavyAttack;
-                    }
-                    else
-                    {
-                        Debug.Log("Not enough stamina for heavy attack!");
-                    }
-                }
             }
         }
+
 
         // jumping 
         if (Input.GetKeyDown(KeyCode.F) && isGrounded && currentStamina >= staminaCostJump)
