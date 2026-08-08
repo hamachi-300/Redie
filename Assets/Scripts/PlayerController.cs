@@ -23,13 +23,21 @@ public class PlayerController : MonoBehaviour
     [Header("Equipped Weapon")]
     [SerializeField] private WeaponData equippedWeapon;
 
+    [Header("Jump Settings")]
+    [SerializeField] private Transform playerVisual;
+    [SerializeField] private float jumpForce = 5f;
+    [SerializeField] private float gravity = 15f;
+    [SerializeField] private float staminaCostJump = 10f;
+
     private float remainHAHT;
     private float currentStamina;
     private float currentSpeed;
-    
+    private float height = 0f;
+    private float verticalVelocity = 0f;
+    private bool isGrounded = true;
+
     private Rigidbody2D rb2d;
     private Animator animator;
-
 
     // getters
     public float CurrentStamina => currentStamina;
@@ -39,7 +47,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         if (rb2d == null) {
             Debug.LogError("Rigidbody2D component not found on the player GameObject");
         } else {
@@ -118,6 +126,8 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostLightAttack)
                 {
                     Debug.Log("Light Attack!");
+                    AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
+                    if (hitbox != null) hitbox.ResetHitbox();
                     animator.SetTrigger("LightAttack");
                     currentStamina -= staminaCostLightAttack;
                 }
@@ -131,6 +141,8 @@ public class PlayerController : MonoBehaviour
                 if (currentStamina >= staminaCostHeavyAttack)
                 {
                     Debug.Log("Heavy Attack!");
+                    AttackColliderControl hitbox = weaponVisualRenderer.GetComponent<AttackColliderControl>();
+                    if (hitbox != null) hitbox.ResetHitbox();
                     animator.SetTrigger("HeavyAttack");
                     currentStamina -= staminaCostHeavyAttack;
                 }
@@ -138,6 +150,38 @@ public class PlayerController : MonoBehaviour
                 {
                     Debug.Log("Not enough stamina for heavy attack!");
                 }
+            }
+        }
+
+        // jumping 
+        if (Input.GetKeyDown(KeyCode.F) && isGrounded && currentStamina >= staminaCostJump)
+        {
+            verticalVelocity = jumpForce;
+            isGrounded = false;
+            float airTime = (2f * jumpForce) / gravity;
+            float clipLength = 7f / 60f;
+
+            animator.SetFloat("JumpAnimSpeed", clipLength / airTime);
+            animator.SetBool("IsJumping", true);
+            currentStamina -= staminaCostJump;
+        }
+
+        if (!isGrounded)
+        {
+            verticalVelocity -= gravity * Time.deltaTime;
+            height += verticalVelocity * Time.deltaTime;
+            // on land on ground
+            if (height <= 0f)
+            {
+                height = 0f;
+                verticalVelocity = 0f;
+                isGrounded = true;
+                animator.SetBool("IsJumping", false);
+            }
+            // apply height to player visual
+            if (playerVisual != null)
+            {
+                playerVisual.localPosition = new Vector3(0, height, 0);
             }
         }
     }
