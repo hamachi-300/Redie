@@ -158,6 +158,10 @@ public class PlayerController : MonoBehaviour
         {
             verticalVelocity = jumpForce;
             isGrounded = false;
+            float airTime = (2f * jumpForce) / gravity;
+            float clipLength = 7f / 60f;
+
+            animator.SetFloat("JumpAnimSpeed", clipLength / airTime);
             animator.SetBool("IsJumping", true);
             currentStamina -= staminaCostJump;
         }
@@ -166,7 +170,7 @@ public class PlayerController : MonoBehaviour
         {
             verticalVelocity -= gravity * Time.deltaTime;
             height += verticalVelocity * Time.deltaTime;
-            // Land on ground
+            // on land on ground
             if (height <= 0f)
             {
                 height = 0f;
@@ -174,7 +178,7 @@ public class PlayerController : MonoBehaviour
                 isGrounded = true;
                 animator.SetBool("IsJumping", false);
             }
-            // Apply visual height offset
+            // apply height to player visual
             if (playerVisual != null)
             {
                 playerVisual.localPosition = new Vector3(0, height, 0);

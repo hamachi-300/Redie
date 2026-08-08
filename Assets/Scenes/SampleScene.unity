@@ -704,7 +704,11 @@ MonoBehaviour:
   staminaCostLightAttack: 10
   staminaCostHeavyAttack: 20
   weaponVisualRenderer: {fileID: 1976146336}
-  equippedWeapon: {fileID: 11400000, guid: c14ec2dae14e00f4e8497c28a7e371da, type: 2}
+  equippedWeapon: {fileID: 0}
+  playerVisual: {fileID: 350372533}
+  jumpForce: 5
+  gravity: 15
+  staminaCostJump: 10
 --- !u!61 &811287067
 BoxCollider2D:
   m_ObjectHideFlags: 0
