@@ -8,15 +8,15 @@
   - [x] Universal Render Pipeline (URP) configuration for 2D lighting.
   - [x] Editor utility for Auto-Save before entering Play Mode.
 
-- [ ] **Sprint A2: Core Attacking & Combat Feedback**
+- [x] **Sprint A2: Core Attacking & Combat Feedback**
   - [x] Basic attack inputs (light and heavy attacks).
   - [x] Stamina consumption for attacks
   - [x] Trigger collider-based weapon hitboxes.
 
 - [ ] **Sprint A3: Platforming, Jumping & Jump Attacks**
-  - Physics-based jumping mechanics (handling variable jump height and gravity scale).
+  - [x] Physics-based jumping mechanics (handling variable jump height and gravity scale).
   - Jump attack implementation (combines jump state with core attack hitbox/damage logic).
-  - Stamina consumption for jumping (optional Souls-like balance tuning).
+  - [x] Stamina consumption for jumping (optional Souls-like balance tuning).
 
 - [ ] **Sprint A4: Dodge & Defense Mechanics**
   - Dodge roll / dash execution with temporary invincibility frames (i-frames).
