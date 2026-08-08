@@ -23,10 +23,19 @@ public class PlayerController : MonoBehaviour
     [Header("Equipped Weapon")]
     [SerializeField] private WeaponData equippedWeapon;
 
+    [Header("Jump Settings")]
+    [SerializeField] private Transform playerVisual;
+    [SerializeField] private float jumpForce = 5f;
+    [SerializeField] private float gravity = 15f;
+    [SerializeField] private float staminaCostJump = 10f;
+
     private float remainHAHT;
     private float currentStamina;
     private float currentSpeed;
-    
+    private float height = 0f;
+    private float verticalVelocity = 0f;
+    private bool isGrounded = true;
+
     private Rigidbody2D rb2d;
     private Animator animator;
 
@@ -38,7 +47,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         if (rb2d == null) {
             Debug.LogError("Rigidbody2D component not found on the player GameObject");
         } else {
@@ -141,6 +150,34 @@ public class PlayerController : MonoBehaviour
                 {
                     Debug.Log("Not enough stamina for heavy attack!");
                 }
+            }
+        }
+
+        // jumping 
+        if (Input.GetKeyDown(KeyCode.F) && isGrounded && currentStamina >= staminaCostJump)
+        {
+            verticalVelocity = jumpForce;
+            isGrounded = false;
+            animator.SetBool("IsJumping", true);
+            currentStamina -= staminaCostJump;
+        }
+
+        if (!isGrounded)
+        {
+            verticalVelocity -= gravity * Time.deltaTime;
+            height += verticalVelocity * Time.deltaTime;
+            // Land on ground
+            if (height <= 0f)
+            {
+                height = 0f;
+                verticalVelocity = 0f;
+                isGrounded = true;
+                animator.SetBool("IsJumping", false);
+            }
+            // Apply visual height offset
+            if (playerVisual != null)
+            {
+                playerVisual.localPosition = new Vector3(0, height, 0);
             }
         }
     }
