@@ -219,7 +219,7 @@ Animator:
   m_GameObject: {fileID: 350372532}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5a1b0c10b95f2a349ad8ff6bc81571c4, type: 2}
+  m_Controller: {fileID: 22100000, guid: 6f3b205b2107ba043bf6fdc402ed384d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -704,10 +704,10 @@ MonoBehaviour:
   staminaCostLightAttack: 10
   staminaCostHeavyAttack: 20
   weaponVisualRenderer: {fileID: 1976146336}
-  equippedWeapon: {fileID: 0}
+  equippedWeapon: {fileID: 11400000, guid: c14ec2dae14e00f4e8497c28a7e371da, type: 2}
   playerVisual: {fileID: 350372533}
-  jumpForce: 5
-  gravity: 15
+  jumpForce: 8
+  gravity: 30
   staminaCostJump: 10
 --- !u!61 &811287067
 BoxCollider2D:
@@ -966,7 +966,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1298142648

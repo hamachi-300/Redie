@@ -25,8 +25,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump Settings")]
     [SerializeField] private Transform playerVisual;
-    [SerializeField] private float jumpForce = 5f;
-    [SerializeField] private float gravity = 15f;
+    [SerializeField] private float jumpForce = 12f;
+    [SerializeField] private float gravity = 30f;
     [SerializeField] private float staminaCostJump = 10f;
 
     private float remainHAHT;
@@ -232,6 +232,7 @@ public class PlayerController : MonoBehaviour
             // apply height to player visual
             if (playerVisual != null)
             {
+                Debug.Log(height);
                 playerVisual.localPosition = new Vector3(0, height, 0);
             }
         }
@@ -264,4 +265,12 @@ public class PlayerController : MonoBehaviour
         
         Debug.Log("Equipped: " + newWeapon.weaponName);
     }
+    void LateUpdate()
+    {
+        if (!isGrounded && playerVisual != null)
+        {
+            playerVisual.localPosition = new Vector3(0, height, 0);
+        }
+    }
+
 }
