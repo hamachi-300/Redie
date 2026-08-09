@@ -13,13 +13,13 @@
   - [x] Stamina consumption for attacks
   - [x] Trigger collider-based weapon hitboxes.
 
-- [ ] **Sprint A3: Platforming, Jumping & Jump Attacks**
+- [x] **Sprint A3: Platforming, Jumping & Jump Attacks**
   - [x] Physics-based jumping mechanics (handling variable jump height and gravity scale).
-  - Jump attack implementation (combines jump state with core attack hitbox/damage logic).
+  - [x] Jump attack implementation (combines jump state with core attack hitbox/damage logic).
   - [x] Stamina consumption for jumping (optional Souls-like balance tuning).
 
 - [ ] **Sprint A4: Dodge & Defense Mechanics**
-  - Dodge roll / dash execution with temporary invincibility frames (i-frames).
+  - [x] Dodge roll / dash execution with temporary invincibility frames (i-frames).
   - Defense block input (e.g., Right Click or Shift) with damage mitigation.
   - Guard stamina consumption and shield active visual feedback.
   - Parry mechanic (negates damage and staggers attacker if timed perfectly).

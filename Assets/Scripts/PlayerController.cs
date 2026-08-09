@@ -29,6 +29,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = 30f;
     [SerializeField] private float staminaCostJump = 10f;
 
+    [Header("Roll Settings")]
+    [SerializeField] private float rollSpeed = 15f;
+    [SerializeField] private float rollDuration = 0.4f;
+    [SerializeField] private float staminaCostRoll = 30f;
+
     private float remainHAHT;
     private float currentStamina;
     private float currentSpeed;
@@ -36,8 +41,9 @@ public class PlayerController : MonoBehaviour
     private float verticalVelocity = 0f;
     private bool isGrounded = true;
     private bool isChargingHeavy = false;
-
-
+    private bool isRolling = false;
+    
+    private Vector2 rollDirection;
     private Rigidbody2D rb2d;
     private Animator animator;
 
@@ -75,6 +81,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // check is menu window is opening
+        if (MenuWindowUI.IsOpen) return;
+
         // Get WASD/Arrow keys input
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
@@ -82,27 +91,30 @@ public class PlayerController : MonoBehaviour
         Vector2 moveDirection = new Vector2(moveX, moveY);
 
         // movement
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (!isRolling)
         {
-            currentSpeed = runSpeed;
-            animator.SetFloat("WalkAnimSpeed", 1f);
-        }
-        else
-        {
-            currentSpeed = walkSpeed;
-            animator.SetFloat("WalkAnimSpeed", 0.5f);
-        }
-        if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
-        if (rb2d != null) { rb2d.velocity = moveDirection * currentSpeed; }
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                currentSpeed = runSpeed;
+                animator.SetFloat("WalkAnimSpeed", 1f);
+            }
+            else
+            {
+                currentSpeed = walkSpeed;
+                animator.SetFloat("WalkAnimSpeed", 0.5f);
+            }
+            if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
+            if (rb2d != null) { rb2d.velocity = moveDirection * currentSpeed; }
 
-        // animation blend tree
-        bool isMoving = (moveDirection.sqrMagnitude > 0.01f);
-        animator.SetBool("IsMoving", isMoving);
+            // animation blend tree
+            bool isMoving = (moveDirection.sqrMagnitude > 0.01f);
+            animator.SetBool("IsMoving", isMoving);
 
-        if (isMoving)
-        {
-            animator.SetFloat("MoveX", moveDirection.x);
-            animator.SetFloat("MoveY", moveDirection.y);
+            if (isMoving)
+            {
+                animator.SetFloat("MoveX", moveDirection.x);
+                animator.SetFloat("MoveY", moveDirection.y);
+            }
         }
 
         // regenerate stamina
@@ -229,12 +241,19 @@ public class PlayerController : MonoBehaviour
                 isGrounded = true;
                 animator.SetBool("IsJumping", false);
             }
-            // apply height to player visual
-            if (playerVisual != null)
-            {
-                Debug.Log(height);
-                playerVisual.localPosition = new Vector3(0, height, 0);
-            }
+        }
+
+        // rolling 
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && currentStamina >= staminaCostRoll)
+        {
+            rollDirection = new Vector2(facingX, facingY).normalized;
+
+            // if stay still roll south
+            if (rollDirection == Vector2.zero) rollDirection = Vector2.down;
+
+            animator.SetTrigger("Roll");
+            currentStamina -= staminaCostRoll;
+            StartCoroutine(PerformRoll());
         }
     }
 
@@ -265,6 +284,25 @@ public class PlayerController : MonoBehaviour
         
         Debug.Log("Equipped: " + newWeapon.weaponName);
     }
+
+    private IEnumerator PerformRoll()
+    {
+        isRolling = true;
+        float timer = 0f;
+        while (timer < rollDuration)
+        {
+            timer += Time.deltaTime;
+            
+            // Push Rigidbody2D forward in facing direction!
+            if (rb2d != null)
+            {
+                rb2d.velocity = rollDirection * rollSpeed;
+            }
+            yield return null;
+        }
+        isRolling = false;
+    }
+
     void LateUpdate()
     {
         if (!isGrounded && playerVisual != null)
