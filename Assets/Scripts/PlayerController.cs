@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [Header("Status Settings")]
     [SerializeField] private float maxStamina = 100f;
     [SerializeField] private float staminaRegenRate = 10f;
+    [SerializeField] private float maxHealth = 100f;
 
     [Header("Attack Settings")]
     [SerializeField] private float heavyAttackHoldTime =  1f;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = true;
     private bool isChargingHeavy = false;
     private bool isRolling = false;
+    private float currentHealth;
     
     private Vector2 rollDirection;
     private Rigidbody2D rb2d;
@@ -67,6 +69,7 @@ public class PlayerController : MonoBehaviour
         // define startup status
         currentStamina = maxStamina;
         currentSpeed = walkSpeed;
+        currentHealth = maxHealth;
 
         // start face direction south
         animator.SetFloat("MoveX", 0f);
@@ -266,7 +269,7 @@ public class PlayerController : MonoBehaviour
         // swap the sprite
         if (weaponVisualRenderer != null)
         {
-            weaponVisualRenderer.sprite = newWeapon.weaponSprite;
+            weaponVisualRenderer.sprite = newWeapon.itemSprite;
             
             // Apply custom scale for the weapon (e.g. Greatsword is larger)
             weaponVisualRenderer.transform.localScale = newWeapon.localScale;
@@ -282,8 +285,16 @@ public class PlayerController : MonoBehaviour
         staminaCostLightAttack = newWeapon.staminaCostLight;
         staminaCostHeavyAttack = newWeapon.staminaCostHeavy;
         
-        Debug.Log("Equipped: " + newWeapon.weaponName);
+        Debug.Log("Equipped: " + newWeapon.itemName);
     }
+
+    public void Heal(float amount)
+    {
+        currentHealth += amount;
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        Debug.Log("Healed! Current HP: " + currentHealth + "/" + maxHealth);
+    }
+
 
     private IEnumerator PerformRoll()
     {

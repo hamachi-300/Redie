@@ -18,6 +18,10 @@ public class MenuWindowUI : MonoBehaviour
     [SerializeField] private Color activeTabColor = new Color(0.35f, 0.35f, 0.4f, 1f);
     [SerializeField] private Color inactiveTabColor = new Color(0.25f, 0.25f, 0.3f, 1f);
 
+    [Header("Inventory UI Elements")]
+    [SerializeField] private GameObject slotPrefab; 
+    [SerializeField] private Transform slotsParent;
+
     public static bool IsOpen { get; private set; } = false;
     private int currentTabIndex = 0;
 
@@ -77,6 +81,7 @@ public class MenuWindowUI : MonoBehaviour
         {
             // Show current tab when opened
             SelectTab(currentTabIndex);
+            RefreshInventoryUI();
         }
     }
 
@@ -108,9 +113,53 @@ public class MenuWindowUI : MonoBehaviour
         int nextIndex = (currentTabIndex + 1) % tabPanels.Length;
         SelectTab(nextIndex);
     }
+
     public void SelectPreviousTab()
     {
         int prevIndex = (currentTabIndex - 1 + tabPanels.Length) % tabPanels.Length;
         SelectTab(prevIndex);
+    }
+
+    public void RefreshInventoryUI()
+    {
+        if (slotsParent == null || slotPrefab == null) return;
+
+        // Clear existing slot buttons
+        foreach (Transform child in slotsParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        if (Inventory.Instance == null) return;
+        List<ItemData> items = Inventory.Instance.OwnedItems;
+
+        // Spawn a button for each item currently owned
+        foreach (ItemData item in items)
+        {
+            GameObject newSlot = Instantiate(slotPrefab, slotsParent);
+
+            // Find child Icon image and set its sprite
+            Transform iconChild = newSlot.transform.Find("Icon");
+            Image slotIcon = (iconChild != null) ? iconChild.GetComponent<Image>() : newSlot.GetComponent<Image>();
+            
+            if (slotIcon != null)
+            {
+                slotIcon.sprite = item.itemSprite;
+            }
+
+            // Bind click to use the item
+            Button btn = newSlot.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick.AddListener(() =>
+                {
+                    PlayerController player = FindObjectOfType<PlayerController>();
+                    if (player != null)
+                    {
+                        item.Use(player);
+                    }
+                });
+            }
+        }
     }
 }
