@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour
     // getters
     public float CurrentStamina => currentStamina;
     public float MaxStamina => maxStamina;
+    public float CurrentHealth => currentHealth;
+    public float MaxHealth => maxHealth;
 
     // Start is called before the first frame update
     void Start()
