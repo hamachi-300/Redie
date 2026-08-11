@@ -373,9 +373,15 @@ public class PlayerController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!isGrounded && playerVisual != null)
+        // make player jump at late update
+        if (playerVisual != null)
         {
             playerVisual.localPosition = new Vector3(0, height, 0);
+            Collider2D col = GetComponent<Collider2D>();
+            if (col != null)
+            {
+                col.offset = new Vector2(col.offset.x, height);
+            }
         }
     }
 
