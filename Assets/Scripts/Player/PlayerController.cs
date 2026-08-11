@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxStamina = 100f;
     [SerializeField] private float staminaRegenRate = 10f;
     [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float sprintStaminaDrainRate = 15f; 
 
     [Header("Attack Settings")]
     [SerializeField] private float heavyAttackHoldTime =  1f;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rollSpeed = 15f;
     [SerializeField] private float rollDuration = 0.4f;
     [SerializeField] private float staminaCostRoll = 30f;
+    [SerializeField] private float rollAnimationFrame = 5f;
 
     private float remainHAHT;
     private float currentStamina;
@@ -44,7 +46,8 @@ public class PlayerController : MonoBehaviour
     private bool isChargingHeavy = false;
     private bool isRolling = false;
     private float currentHealth;
-    
+    private RuntimeAnimatorController baseAnimatorController;
+
     private Vector2 rollDirection;
     private Rigidbody2D rb2d;
     private Animator animator;
@@ -58,6 +61,13 @@ public class PlayerController : MonoBehaviour
     {
         rb2d = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
+
+        // save default animation controller
+        if (animator != null)
+        {
+            baseAnimatorController = animator.runtimeAnimatorController;
+        }
+
         if (rb2d == null) {
             Debug.LogError("Rigidbody2D component not found on the player GameObject");
         } else {
@@ -96,36 +106,48 @@ public class PlayerController : MonoBehaviour
         // movement
         if (!isRolling)
         {
-            if (Input.GetKey(KeyCode.LeftShift))
+            bool isMoving = (moveDirection.sqrMagnitude > 0.01f);
+            bool wantsToSprint = Input.GetKey(KeyCode.LeftShift);
+
+            if (isMoving) 
+            {
+                animator.SetBool("IsMoving", true);
+                animator.SetFloat("MoveX", moveDirection.x);
+                animator.SetFloat("MoveY", moveDirection.y);
+            }
+            else
+            {
+                animator.SetBool("IsMoving", false);
+            }
+
+            // Sprint only if we want to, are actually moving, and have stamina left!
+            if (wantsToSprint && isMoving && currentStamina > sprintStaminaDrainRate * Time.deltaTime && isGrounded)
             {
                 currentSpeed = runSpeed;
                 animator.SetFloat("WalkAnimSpeed", 1f);
+
+                // Drain stamina over time
+                currentStamina -= sprintStaminaDrainRate * Time.deltaTime;
+                currentStamina = Mathf.Max(currentStamina, 0f); // Don't let it go below 0
             }
             else
             {
                 currentSpeed = walkSpeed;
                 animator.SetFloat("WalkAnimSpeed", 0.5f);
             }
+            
             if (moveDirection.sqrMagnitude > 1f){ moveDirection.Normalize(); }
             if (rb2d != null) { rb2d.velocity = moveDirection * currentSpeed; }
-
-            // animation blend tree
-            bool isMoving = (moveDirection.sqrMagnitude > 0.01f);
-            animator.SetBool("IsMoving", isMoving);
-
-            if (isMoving)
-            {
-                animator.SetFloat("MoveX", moveDirection.x);
-                animator.SetFloat("MoveY", moveDirection.y);
-            }
         }
 
-        // regenerate stamina
-        if (currentStamina < maxStamina)
+        // regenerate stamina (only if not currently sprinting)
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift) && (moveDirection.sqrMagnitude > 0.01f) && (currentStamina > 0f);
+        if (currentStamina < maxStamina && !isSprinting)
         {
             currentStamina += staminaRegenRate * Time.deltaTime;
             currentStamina = Mathf.Min(currentStamina, maxStamina);
         }
+
 
         // get direction of player facing
         float facingX = animator.GetFloat("MoveX");
@@ -247,8 +269,11 @@ public class PlayerController : MonoBehaviour
         }
 
         // rolling 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && currentStamina >= staminaCostRoll)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && currentStamina >= staminaCostRoll && isRolling != true)
         {
+            float rollClipLength = rollAnimationFrame / 60f;
+            animator.SetFloat("RollAnimSpeed", rollClipLength / rollDuration);
+
             rollDirection = new Vector2(facingX, facingY).normalized;
 
             // if stay still roll south
@@ -264,9 +289,17 @@ public class PlayerController : MonoBehaviour
     {
         if (newWeapon == null) return;
 
+        // TOGGLE: If you try to equip the same weapon that is already active, unequip it!
+        if (equippedWeapon == newWeapon)
+        {
+            UnequipWeapon();
+            return; // Exit early
+        }
+
+        // Otherwise, equip the new weapon normally
         equippedWeapon = newWeapon;
 
-        // swap the sprite
+        // Swap the sprite
         if (weaponVisualRenderer != null)
         {
             weaponVisualRenderer.sprite = newWeapon.itemSprite;
@@ -275,17 +308,39 @@ public class PlayerController : MonoBehaviour
             weaponVisualRenderer.transform.localScale = newWeapon.localScale;
         }
 
-        // swap the Animator Override Controller
+        // Swap the Animator Override Controller
         if (animator != null && newWeapon.animatorOverride != null)
         {
             animator.runtimeAnimatorController = newWeapon.animatorOverride;
         }
 
-        // update stats
+        // Update stats
         staminaCostLightAttack = newWeapon.staminaCostLight;
         staminaCostHeavyAttack = newWeapon.staminaCostHeavy;
-        
+
         Debug.Log("Equipped: " + newWeapon.itemName);
+    }
+
+    public void UnequipWeapon()
+    {
+        equippedWeapon = null;
+
+        // Clear the sprite
+        if (weaponVisualRenderer != null)
+        {
+            weaponVisualRenderer.sprite = null;
+        }
+
+        // Restore the default unarmed animator controller
+        if (animator != null && baseAnimatorController != null)
+        {
+            animator.runtimeAnimatorController = baseAnimatorController;
+        }
+
+        // Reset stats to unarmed defaults
+        staminaCostLightAttack = 10f; 
+        staminaCostHeavyAttack = 20f;
+        Debug.Log("Weapon Unequipped.");
     }
 
     public void Heal(float amount)

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e992ea89fe7f50408ee14e2b45d34ff, type: 3}
   m_Name: HpPotionData
   m_EditorClassIdentifier: 
-  itemName: 
-  itemSprite: {fileID: 0}
-  itemDescription: 
+  itemName: HP Potion
+  itemSprite: {fileID: 21300000, guid: 320b0817053ddb24a9a6529ca2c616c3, type: 3}
+  itemDescription: HP Potion. Use to restore your HP.
   healAmount: 25

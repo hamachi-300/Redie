@@ -29,9 +29,9 @@
 ## Milestone B: Souls-Like Systems & Content
 
 - [ ] **Sprint B1: HP Potion & Inventory Items**
-  - Quick-item inventory slot (UI display and selection).
-  - HP Potion (Estus flask style) with limited charges that replenish on clearing a map section or starting a new run.
-  - Potion drinking animation state (player is vulnerable while healing).
+  - [x] Quick-item inventory slot (UI display and selection).
+  - [x] HP Potion (Estus flask style) with limited charges that replenish on clearing a map section or starting a new run.
+  - [ ] Potion drinking animation state (player is vulnerable while healing).
 
 - [ ] **Sprint B2: Enemies & Advanced Movesets**
   - Base enemy AI (patrolling, line-of-sight tracking, alert states).

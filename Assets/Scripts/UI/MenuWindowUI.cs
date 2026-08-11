@@ -133,13 +133,14 @@ public class MenuWindowUI : MonoBehaviour
         if (Inventory.Instance == null) return;
         List<ItemData> items = Inventory.Instance.OwnedItems;
 
+
         // Spawn a button for each item currently owned
         foreach (ItemData item in items)
         {
             GameObject newSlot = Instantiate(slotPrefab, slotsParent);
 
             // Find child Icon image and set its sprite
-            Transform iconChild = newSlot.transform.Find("Icon");
+            Transform iconChild = newSlot.transform.Find("InventoryItemIcon");
             Image slotIcon = (iconChild != null) ? iconChild.GetComponent<Image>() : newSlot.GetComponent<Image>();
             
             if (slotIcon != null)
