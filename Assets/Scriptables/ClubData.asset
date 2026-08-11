@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91d83d89667f69348bf01f09212d410b, type: 3}
   m_Name: ClubData
   m_EditorClassIdentifier: 
-  weaponName: Club
-  weaponSprite: {fileID: 21300000, guid: 8a88931a2fb40c54592da0e104c0449c, type: 3}
+  itemName: Club
+  itemSprite: {fileID: 21300000, guid: 8a88931a2fb40c54592da0e104c0449c, type: 3}
+  itemDescription: Large club. which no any special.
   animatorOverride: {fileID: 22100000, guid: 6f3b205b2107ba043bf6fdc402ed384d, type: 2}
   localScale: {x: 1.5, y: 1.5, z: 1.5}
   staminaCostLight: 10
   staminaCostHeavy: 20
+  lightAttackDamage: 15
+  heavyAttackDamage: 35
