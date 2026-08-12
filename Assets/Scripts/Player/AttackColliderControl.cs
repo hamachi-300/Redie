@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class AttackColliderControl : MonoBehaviour
 {
+    [Header("Default Unarmed Settings")]
+    [SerializeField] private float defaultLightDamage = 5f;
+    [SerializeField] private float defaultHeavyDamage = 15f;
+
     private PlayerController player;
     private List<Collider2D> alreadyHitTargets = new List<Collider2D>();
 
-    // Start is called before the first frame update
     void Start()
     {
         player = GetComponentInParent<PlayerController>();
     }
 
-    // Update is called once per frame
     void OnEnable()
     {
         alreadyHitTargets.Clear();
@@ -23,9 +25,35 @@ public class AttackColliderControl : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
+            // Prevent hitting the same enemy multiple times in a single swing frame
             if (alreadyHitTargets.Contains(other)) return;
             alreadyHitTargets.Add(other);
-            Debug.Log("Hit enemy: " + other.name);
+
+            // 1. Get the EnemyHealth script on the target
+            EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
+            if (enemyHealth != null && player != null)
+            {
+                // 2. Check if we are currently performing a Heavy Attack
+                bool isHeavy = false;
+                if (player.PlayerAnimator != null)
+                {
+                    isHeavy = player.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsName("HeavyAttack");
+                }
+
+                // 3. Determine and apply damage
+                float damage = 0f;
+                if (player.EquippedWeapon != null)
+                {
+                    damage = isHeavy ? player.EquippedWeapon.heavyAttackDamage : player.EquippedWeapon.lightAttackDamage;
+                }
+                else
+                {
+                    // Default unarmed (fists) damage values when no weapon is equipped
+                    damage = isHeavy ? defaultHeavyDamage : defaultLightDamage;
+                }
+
+                enemyHealth.TakeDamage(damage);
+            }
         }
     }
 
