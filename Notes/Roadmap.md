@@ -34,7 +34,7 @@
   - [ ] Potion drinking animation state (player is vulnerable while healing).
 
 - [ ] **Sprint B2: Enemies & Advanced Movesets**
-  - Base enemy AI (patrolling, line-of-sight tracking, alert states).
+  - [x] Base enemy AI (patrolling, line-of-sight tracking, alert states).
   - Enemy movesets (multi-hit combos, telegraphing indicators before attack, recovery windows).
   - Enemy health bars and impact visual feedback.
 
