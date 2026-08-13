@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 24414213}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.357477, y: -0.3840311, z: -0.038113795}
+  m_LocalPosition: {x: -1.1174774, y: -0.024031073, z: -0.038113795}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -155,8 +155,8 @@ Transform:
   - {fileID: 166810995}
   - {fileID: 1911683755}
   - {fileID: 336640584}
-  m_Father: {fileID: 2017661393}
-  m_RootOrder: 1
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &55831363
 GameObject:
@@ -4627,6 +4627,7 @@ GameObject:
   - component: {fileID: 2017661392}
   - component: {fileID: 2017661391}
   - component: {fileID: 2017661390}
+  - component: {fileID: 2017661394}
   m_Layer: 0
   m_Name: Warrior
   m_TagString: Enemy
@@ -4723,10 +4724,25 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1855603739}
-  - {fileID: 24414214}
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2017661394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017661389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4568b9f347f7df746b3bfab72deb82f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 20
+  deathTriggerName: Die
+  destroyOnDeath: 0
+  deathDelay: 1
 --- !u!1 &2038815595
 GameObject:
   m_ObjectHideFlags: 0
