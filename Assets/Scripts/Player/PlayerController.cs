@@ -101,6 +101,23 @@ public class PlayerController : MonoBehaviour
         {
             EquipWeapon(equippedWeapon);
         }
+
+        // Teleport Spawn Position check
+        if (!string.IsNullOrEmpty(SceneTransition.nextSpawnPointName))
+        {
+            GameObject spawnPoint = GameObject.Find(SceneTransition.nextSpawnPointName);
+            if (spawnPoint != null)
+            {
+                rb2d.position = spawnPoint.transform.position;
+                transform.position = spawnPoint.transform.position;
+                Debug.Log("Player spawned at custom point: " + SceneTransition.nextSpawnPointName);
+            }
+            else
+            {
+                Debug.LogWarning("Spawn point '" + SceneTransition.nextSpawnPointName + "' not found in scene!");
+            }
+            SceneTransition.nextSpawnPointName = null; // Clear to prevent double spawn
+        }
     }
 
     void Update()

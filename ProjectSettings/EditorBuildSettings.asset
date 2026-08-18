@@ -5,7 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/StartCave.unity
+    guid: e2ccd1067fab1644fbfff7a6ac12b4a6
+  - enabled: 1
+    path: Assets/Scenes/SnowField.unity
+    guid: b4ed0a3da5c9f3e439e9a2e55d2adc99
+  - enabled: 1
+    path: Assets/Scenes/BossCave.unity
+    guid: fd3cd86e85bb49b48a8ca27011e3b54c
   m_configObjects: {}
