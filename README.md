@@ -38,13 +38,24 @@ A challenging 2D single-player Souls-like action roguelike developed in Unity.
 
 Since this project manages Unity assets, follow these setup steps:
 
-### 1. Clone the Repository
+### 1. Install Git LFS (Required)
+This project uses **Git Large File Storage (LFS)** to manage large scene files and spritesheets. 
+
+Before cloning, you **must** install Git LFS on your system, or your scenes and sprites will be downloaded as broken 1 KB pointer files:
+1. Download and run the installer from **[git-lfs.github.com](https://git-lfs.github.com)**.
+2. Open your terminal (PowerShell, Command Prompt, or Git Bash) and run this command once:
+   ```bash
+   git lfs install
+   ```
+
+### 2. Clone the Repository
 Clone the repository using HTTPS or SSH:
 ```bash
 git clone https://github.com/hamachi-300/Redie.git
 ```
+*(Git LFS will run in the background and automatically download all heavy textures, audio, and scene files during the cloning process).*
 
-### 2. Open in Unity
+### 3. Open in Unity
 1. Open **Unity Hub**.
 2. Click **Add project from disk**.
 3. Select the cloned `Redie` directory.
