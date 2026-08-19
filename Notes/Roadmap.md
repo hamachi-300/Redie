@@ -72,10 +72,9 @@
   - **Background Music (BGM):** Atmospheric, looping tracks for the main menu, explore map sections, and an intense orchestral track for the boss fight.
   - **Death SFX:** A heavy, echoey crash/doom sound effect to play immediately upon death during the "YOU DIED" screen transition.
 
-- make entrance to next area (ending show end credit)
-- make game's main menu when open this game 
 - make auto save system (continue button, new game button in main menu, also have load save button to choose)
-- after end credit ask player to continue in world or delete this save and back to main menu
+- after end credit remove skip button, instead show text for tell player can skip using ese key
+- add exit button in menu window inside game
 - export to real game and playtest
 - place enemy and boss in map and item
 - loading scene when change map

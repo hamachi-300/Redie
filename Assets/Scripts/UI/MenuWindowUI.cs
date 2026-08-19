@@ -22,6 +22,10 @@ public class MenuWindowUI : MonoBehaviour
     [SerializeField] private GameObject slotPrefab; 
     [SerializeField] private Transform slotsParent;
 
+    [Header("Settings Tab Elements")]
+    [SerializeField] private Button exitToMenuButton;
+    [SerializeField] private string mainMenuSceneName = "GameMenu";
+
     public static bool IsOpen { get; private set; } = false;
     private int currentTabIndex = 0;
 
@@ -32,6 +36,11 @@ public class MenuWindowUI : MonoBehaviour
         {
             menuPanel.SetActive(false);
             IsOpen = false;
+        }
+
+        if (exitToMenuButton != null)
+        {
+            exitToMenuButton.onClick.AddListener(ExitToMainMenu);
         }
 
         // add listener for tab buttons
@@ -162,5 +171,25 @@ public class MenuWindowUI : MonoBehaviour
                 });
             }
         }
+    }
+
+    private void ExitToMainMenu()
+    {
+        // 1. Force a save immediately before exiting
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.SaveGame();
+        }
+
+        // 2. Hide menu panel
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(false);
+        }
+        IsOpen = false;
+
+        // 3. Load game menu scene
+        Debug.Log("Exiting to menu: " + mainMenuSceneName);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(mainMenuSceneName);
     }
 }

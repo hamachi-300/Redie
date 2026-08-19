@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/BossCave.unity
     guid: fd3cd86e85bb49b48a8ca27011e3b54c
+  - enabled: 1
+    path: Assets/Scenes/EndCredits.unity
+    guid: 66116b28995eaee4fbed546ff51815a5
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 149e24f2f013de044ac17705a551625e
   m_configObjects: {}

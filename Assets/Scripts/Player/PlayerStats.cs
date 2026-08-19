@@ -73,6 +73,12 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    public void SetStats(float health, float stamina)
+    {
+        currentHealth = Mathf.Clamp(health, 0f, maxHealth);
+        currentStamina = Mathf.Clamp(stamina, 0f, maxStamina);
+    }
+
     private void Die()
     {
         Debug.Log("Player has died!");
