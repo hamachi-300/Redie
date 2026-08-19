@@ -34,7 +34,7 @@
   - [ ] Potion drinking animation state (player is vulnerable while healing).
 
 - [ ] **Sprint B2: Enemies & Advanced Movesets**
-  - Base enemy AI (patrolling, line-of-sight tracking, alert states).
+  - [x] Base enemy AI (patrolling, line-of-sight tracking, alert states).
   - Enemy movesets (multi-hit combos, telegraphing indicators before attack, recovery windows).
   - Enemy health bars and impact visual feedback.
 
@@ -72,3 +72,9 @@
   - **Background Music (BGM):** Atmospheric, looping tracks for the main menu, explore map sections, and an intense orchestral track for the boss fight.
   - **Death SFX:** A heavy, echoey crash/doom sound effect to play immediately upon death during the "YOU DIED" screen transition.
 
+- make auto save system (continue button, new game button in main menu, also have load save button to choose)
+- after end credit remove skip button, instead show text for tell player can skip using ese key
+- add exit button in menu window inside game
+- export to real game and playtest
+- place enemy and boss in map and item
+- loading scene when change map
