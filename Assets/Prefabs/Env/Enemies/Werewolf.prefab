@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17fe638119e4f34408446f174f681b83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
+  speed: 4
   signRange: 10
   defaultFacingDirection: {x: 0, y: -1}
   patrolWaypoints: []
@@ -212,7 +212,7 @@ MonoBehaviour:
     m_Bits: 8
   attackRange: 1.2
   attackCooldown: 1.5
-  attackDamage: 15
+  attackDamage: 25
   attackDelayTime: 0.4
   attackHitbox: {fileID: 5113825816131902304}
 --- !u!114 &5113825815047128270

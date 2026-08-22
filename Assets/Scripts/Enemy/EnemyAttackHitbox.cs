@@ -24,6 +24,7 @@ public class EnemyAttackHitbox : MonoBehaviour
             PlayerController player = other.GetComponent<PlayerController>();
             if (player != null)
             {
+                Debug.Log("tet");
                 player.TakeDamage(currentDamage);
             }
         }

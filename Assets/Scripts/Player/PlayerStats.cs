@@ -10,7 +10,11 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private float maxStamina = 100f;
     [SerializeField] private float staminaRegenRate = 10f;
     [SerializeField] private float sprintStaminaDrainRate = 15f;
+
     private float currentStamina;
+    private bool isDie = false;
+
+    private PlayerController playerController;
 
     // Getters
     public float MaxHealth => maxHealth;
@@ -23,6 +27,7 @@ public class PlayerStats : MonoBehaviour
     {
         currentHealth = maxHealth;
         currentStamina = maxStamina;
+        playerController = GetComponent<PlayerController>();
     }
 
     public void Heal(float amount)
@@ -39,8 +44,9 @@ public class PlayerStats : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0f);
 
-        if (currentHealth <= 0f)
+        if (currentHealth <= 0f && !isDie)
         {
+            isDie = true;
             Die();
         }
     }
@@ -82,6 +88,6 @@ public class PlayerStats : MonoBehaviour
     private void Die()
     {
         Debug.Log("Player has died!");
-        // (You can invoke death animation or screen reloading from here)
+        playerController.Die();
     }
 }

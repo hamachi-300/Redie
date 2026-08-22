@@ -31,16 +31,16 @@ public class EndCreditsScroll : MonoBehaviour
             int totalCoins = PlayerPrefs.GetInt("TotalCoinsCollected", 0);
             int levelsCleared = PlayerPrefs.GetInt("LevelsCleared", 1);
             
-            statsText.text = "End Credit\n" +
-                             "Developer\n" +
-                             "Pluem\n" +
-                             "Lorem Ipsum is simply dummy text of the printing and typesetting\n" +
-                             "Lorem Ipsum is simply dummy text of the printing and typesetting\n" +
-                             "Lorem Ipsum is simply dummy text of the printing and typesetting\n" +
-                             "Lorem Ipsum is simply dummy text of the printing and typesetting\n" +
-                             "Lorem Ipsum is simply dummy text of the printing and typesetting\n" +
-                             "Lorem Ipsum is simply dummy text of the printing and typesetting\n" +
-                             "Lorem Ipsum is simply dummy text of the printing and typesetting\n";
+            statsText.text = "Re:DIE\n\n\n\n\n" +
+                             "--- DEVELOPER ---\n" +
+                             "Pluem\n\n\n\n\n" +
+                             "--- LEVEL DESIGN ---\n" +
+                             "Pluem\n\n\n\n\n" +
+                             "--- ART & DESIGN ---\n" +
+                             "Pluem & his AI friend\n\n\n\n\n" +
+                             "--- SOUND & MUSIC ---\n" +
+                             "I don't know ... yet\n\n\n\n\n" +
+                             "--- THANK FOR PLAYING ---\n\n\n\n\n";
 
             // Force Unity's layout system to calculate the text height immediately on frame 1
             Canvas.ForceUpdateCanvases();
@@ -60,7 +60,7 @@ public class EndCreditsScroll : MonoBehaviour
             // 2. Stop scrolling if container goes past the screen top height boundary plus padding
             // We read the actual height of the statsText rect in pixels
             float textHeight = (statsText != null) ? statsText.rectTransform.rect.height : creditsContainer.rect.height;
-            if (creditsContainer.anchoredPosition.y - 200 >= textHeight)
+            if (creditsContainer.anchoredPosition.y >= textHeight)
             {
                 ReturnToMainMenu();
             }

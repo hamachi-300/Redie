@@ -345,7 +345,7 @@ MonoBehaviour:
   rollAnimationFrame: 5
   weaponVisualRenderer: {fileID: 8284562352548065663}
   staminaCostRoll: 20
-  staminaCostJump: 10
+  staminaCostJump: 20
   staminaCostLightAttack: 10
   staminaCostHeavyAttack: 20
   heavyAttackHoldTime: 1
