@@ -68,6 +68,12 @@ public class GameOverUI : MonoBehaviour
             respawnButton.gameObject.SetActive(false);
         }
 
+        // Reset ONLY items and enemies so they respawn on the map
+        ItemPickup.ClearPickedUpItems();
+        EnemyHealth.ClearDefeatedEnemies();
+
+        // Note: Save data and Inventory are NOT deleted/cleared here, so player items remain!
+
         SceneTransition.nextSpawnPointName = fallbackSpawnPointName;
         SceneManager.LoadScene(fallbackSceneName);
     }

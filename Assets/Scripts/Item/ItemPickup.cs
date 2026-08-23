@@ -37,12 +37,27 @@ public class ItemPickup : MonoBehaviour
 
     private string GetUniqueID()
     {
-        if (!string.IsNullOrEmpty(uniqueID))
+        if (!string.IsNullOrWhiteSpace(uniqueID))
         {
-            return uniqueID;
+            return uniqueID.Trim();
         }
-        // Auto-generated fallback unique ID based on scene, name and position
-        return gameObject.scene.name + "_" + gameObject.name + "_" + transform.position.x + "_" + transform.position.y;
+        
+        // Build hierarchy path to distinguish between items with the same name under different parents
+        string path = gameObject.name;
+        Transform t = transform.parent;
+        while (t != null)
+        {
+            path = t.name + "/" + path;
+            t = t.parent;
+        }
+
+        // Round coordinates to 2 decimal places to avoid tiny float variations causing mismatch
+        float roundedX = Mathf.Round(transform.position.x * 100f) / 100f;
+        float roundedY = Mathf.Round(transform.position.y * 100f) / 100f;
+
+        string itemName = (itemData != null) ? itemData.itemName : "Item";
+
+        return gameObject.scene.name + "_" + path + "_" + itemName + "_" + roundedX + "_" + roundedY;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

@@ -27,7 +27,6 @@ public class EnemyAI : MonoBehaviour
     [Header("Attack Hitbox Reference")]
     [SerializeField] private EnemyAttackHitbox attackHitbox;
 
-
     private float nextAttackTime = 0f;
     private bool isAttacking = false;
     private bool isFoundPlayer = false;

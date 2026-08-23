@@ -1,7 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
+    [Header("Persistence Settings")]
+    [SerializeField] private string uniqueID; // Unique identifier (can leave empty for auto-generated coordinates fallback)
+
     [Header("Health Settings")]
     [SerializeField] private float maxHealth = 50f;
     private float currentHealth;
@@ -11,14 +15,36 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private bool destroyOnDeath = false; // Toggle to leave corpse in the scene or destroy it
     [SerializeField] private float deathDelay = 1.0f; // Time in seconds to wait before destroying (if enabled)
 
+    // Static set of all defeated enemy unique IDs
+    private static HashSet<string> defeatedEnemies = new HashSet<string>();
+
+    public static HashSet<string> DefeatedEnemies
+    {
+        get => defeatedEnemies;
+        set => defeatedEnemies = value;
+    }
+
+    public static void ClearDefeatedEnemies()
+    {
+        defeatedEnemies.Clear();
+    }
+
     private Animator animator;
     private EnemyAI enemyAI;
     private Collider2D enemyCollider;
     private Rigidbody2D rb2d;
     private bool isDead = false;
 
-    void Start()
+    private void Start()
     {
+        // 0. Check if this enemy has already been defeated previously
+        string id = GetUniqueID();
+        if (defeatedEnemies.Contains(id))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         currentHealth = maxHealth;
 
         // Cache components
@@ -26,6 +52,29 @@ public class EnemyHealth : MonoBehaviour
         enemyAI = GetComponent<EnemyAI>();
         enemyCollider = GetComponent<Collider2D>();
         rb2d = GetComponent<Rigidbody2D>();
+    }
+
+    private string GetUniqueID()
+    {
+        if (!string.IsNullOrWhiteSpace(uniqueID))
+        {
+            return uniqueID.Trim();
+        }
+        
+        // Build hierarchy path to distinguish between enemies with the same name under different parents
+        string path = gameObject.name;
+        Transform t = transform.parent;
+        while (t != null)
+        {
+            path = t.name + "/" + path;
+            t = t.parent;
+        }
+
+        // Round coordinates to 2 decimal places to avoid tiny float variations causing mismatch
+        float roundedX = Mathf.Round(transform.position.x * 100f) / 100f;
+        float roundedY = Mathf.Round(transform.position.y * 100f) / 100f;
+
+        return gameObject.scene.name + "_" + path + "_" + roundedX + "_" + roundedY;
     }
 
     public void TakeDamage(float damage)
@@ -47,6 +96,10 @@ public class EnemyHealth : MonoBehaviour
     {
         isDead = true;
         Debug.Log(gameObject.name + " has died!");
+
+        // Record that this enemy is defeated
+        string id = GetUniqueID();
+        defeatedEnemies.Add(id);
 
         // 1. Play the death animation trigger
         if (animator != null)

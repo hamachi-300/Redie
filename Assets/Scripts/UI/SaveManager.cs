@@ -31,6 +31,7 @@ public class SaveManager : MonoBehaviour
         public float currentStamina;
         public List<string> inventoryItemNames = new List<string>();
         public List<string> pickedUpItemIDs = new List<string>();
+        public List<string> defeatedEnemyIDs = new List<string>();
     }
 
     private void Awake()
@@ -117,6 +118,8 @@ public class SaveManager : MonoBehaviour
 
         // Save permanently picked up items
         data.pickedUpItemIDs = new List<string>(ItemPickup.PickedUpItems);
+        // Save permanently defeated enemies
+        data.defeatedEnemyIDs = new List<string>(EnemyHealth.DefeatedEnemies);
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(saveFilePath, json);
@@ -133,6 +136,7 @@ public class SaveManager : MonoBehaviour
             Debug.Log("Save file deleted.");
         }
         ItemPickup.ClearPickedUpItems();
+        EnemyHealth.ClearDefeatedEnemies();
     }
 
     public void InitiateLoadGame()
@@ -196,6 +200,16 @@ public class SaveManager : MonoBehaviour
         else
         {
             ItemPickup.ClearPickedUpItems();
+        }
+
+        // Restore permanently defeated enemies history
+        if (loadedSaveData.defeatedEnemyIDs != null)
+        {
+            EnemyHealth.DefeatedEnemies = new HashSet<string>(loadedSaveData.defeatedEnemyIDs);
+        }
+        else
+        {
+            EnemyHealth.ClearDefeatedEnemies();
         }
 
         // 3. Restore Inventory Items
