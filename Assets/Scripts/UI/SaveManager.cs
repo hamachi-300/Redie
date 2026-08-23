@@ -30,6 +30,7 @@ public class SaveManager : MonoBehaviour
         public float currentHealth;
         public float currentStamina;
         public List<string> inventoryItemNames = new List<string>();
+        public List<string> pickedUpItemIDs = new List<string>();
     }
 
     private void Awake()
@@ -114,6 +115,9 @@ public class SaveManager : MonoBehaviour
             }
         }
 
+        // Save permanently picked up items
+        data.pickedUpItemIDs = new List<string>(ItemPickup.PickedUpItems);
+
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(saveFilePath, json);
         Debug.Log("Game Auto-Saved to " + saveFilePath);
@@ -128,6 +132,7 @@ public class SaveManager : MonoBehaviour
             File.Delete(saveFilePath);
             Debug.Log("Save file deleted.");
         }
+        ItemPickup.ClearPickedUpItems();
     }
 
     public void InitiateLoadGame()
@@ -183,10 +188,20 @@ public class SaveManager : MonoBehaviour
             stats.SetStats(loadedSaveData.currentHealth, loadedSaveData.currentStamina);
         }
 
+        // Restore permanently picked up items history
+        if (loadedSaveData.pickedUpItemIDs != null)
+        {
+            ItemPickup.PickedUpItems = new HashSet<string>(loadedSaveData.pickedUpItemIDs);
+        }
+        else
+        {
+            ItemPickup.ClearPickedUpItems();
+        }
+
         // 3. Restore Inventory Items
         if (Inventory.Instance != null)
         {
-            Inventory.Instance.OwnedItems.Clear();
+            Inventory.Instance.ClearInventory();
             foreach (string itemName in loadedSaveData.inventoryItemNames)
             {
                 ItemData matchedItem = allPossibleItems.Find(item => item != null && item.itemName == itemName);

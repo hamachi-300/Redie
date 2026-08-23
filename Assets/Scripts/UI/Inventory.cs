@@ -6,6 +6,9 @@ public class Inventory : MonoBehaviour
 {
     public static Inventory Instance { get; private set; }
 
+    // Static list that survives scene changes to persist items
+    private static List<ItemData> persistentItems = new List<ItemData>();
+
     [SerializeField] private List<ItemData> ownedItems = new List<ItemData>();
     public List<ItemData> OwnedItems => ownedItems;
 
@@ -14,6 +17,9 @@ public class Inventory : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            // Restore persistent items into the active scene's inventory
+            ownedItems.Clear();
+            ownedItems.AddRange(persistentItems);
         }
         else
         {
@@ -24,6 +30,7 @@ public class Inventory : MonoBehaviour
     public void AddItem(ItemData item)
     {
         ownedItems.Add(item);
+        persistentItems.Add(item);
         Debug.Log("Picked up: " + item.itemName);
 
         RefreshUIIfOpen();
@@ -34,10 +41,18 @@ public class Inventory : MonoBehaviour
         if (ownedItems.Contains(item))
         {
             ownedItems.Remove(item);
+            persistentItems.Remove(item);
             Debug.Log("Removed from inventory: " + item.itemName);
 
             RefreshUIIfOpen();
         }
+    }
+
+    public void ClearInventory()
+    {
+        ownedItems.Clear();
+        persistentItems.Clear();
+        RefreshUIIfOpen();
     }
 
     private void RefreshUIIfOpen()
