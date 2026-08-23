@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = true;
     private bool isChargingHeavy = false;
     private bool isRolling = false;
+    private bool isDie = false;
     private RuntimeAnimatorController baseAnimatorController;
 
     private Vector2 rollDirection;
@@ -122,8 +123,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Check if menu window is open
-        if (MenuWindowUI.IsOpen) return;
+        // Check if menu window is open or player is dead
+        if (MenuWindowUI.IsOpen || isDie) return;
 
         // Get WASD/Arrow keys input
         float moveX = Input.GetAxisRaw("Horizontal");
@@ -357,9 +358,16 @@ public class PlayerController : MonoBehaviour
         stats.TakeDamage(damage, isRolling);
     }
 
-    private void Die()
+    public void Die()
     {
-        // Handled by stats script
+        isDie = true;
+        animator.SetTrigger("Die");
+        
+        // Show the Game Over screen if it exists in the scene
+        if (GameOverUI.Instance != null)
+        {
+            GameOverUI.Instance.ShowGameOverScreen();
+        }
     }
 
     private IEnumerator PerformRoll()

@@ -48,7 +48,7 @@ public class SceneTransition : MonoBehaviour
             nextSpawnPointName = targetSpawnPointName;
             
             Debug.Log("Teleporting player to scene: " + targetSceneName + " at spawn point: " + targetSpawnPointName);
-            SceneManager.LoadScene(targetSceneName);
+            LoadingManager.LoadScene(targetSceneName);
         }
         else
         {
