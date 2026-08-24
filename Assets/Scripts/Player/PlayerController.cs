@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip rollSound;
     [SerializeField] private AudioClip walkSound;
     [SerializeField] private AudioClip runSound;
+    [SerializeField] private AudioClip deathSound; // เพิ่มช่องใส่ไฟล์เสียงตอนตาย
     [SerializeField] private float walkStepInterval = 0.4f; // ระยะห่างก้าวตอนเดิน (วินาที)
     [SerializeField] private float runStepInterval = 0.25f; // ระยะห่างก้าวตอนวิ่ง (วินาที)
 
@@ -368,6 +369,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void PlayDeathSound()
+    {
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.PlayOneShot(deathSound);
+        }
+    }
+
     public void EquipWeapon(WeaponData newWeapon)
     {
         if (newWeapon == null) return;
@@ -435,6 +444,7 @@ public class PlayerController : MonoBehaviour
     {
         isDie = true;
         animator.SetTrigger("Die");
+        PlayDeathSound(); // เรียกใช้เสียงตอนตาย
         
         // Show the Game Over screen if it exists in the scene
         if (GameOverUI.Instance != null)
