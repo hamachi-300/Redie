@@ -15,6 +15,12 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private bool destroyOnDeath = false; // Toggle to leave corpse in the scene or destroy it
     [SerializeField] private float deathDelay = 1.0f; // Time in seconds to wait before destroying (if enabled)
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip attackSound; // เพิ่มไฟล์เสียงตอนมอนสเตอร์โจมตี
+    [SerializeField] private AudioClip hurtSound;
+    [SerializeField] private AudioClip deathSound;
+
     // Static set of all defeated enemy unique IDs
     private static HashSet<string> defeatedEnemies = new HashSet<string>();
 
@@ -52,6 +58,12 @@ public class EnemyHealth : MonoBehaviour
         enemyAI = GetComponent<EnemyAI>();
         enemyCollider = GetComponent<Collider2D>();
         rb2d = GetComponent<Rigidbody2D>();
+
+        // Cache AudioSource if not manually assigned
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     private string GetUniqueID()
@@ -90,6 +102,27 @@ public class EnemyHealth : MonoBehaviour
         {
             Die();
         }
+        else
+        {
+            // เล่นเสียงโดนตี (กรณีมอนสเตอร์ยังไม่ตาย)
+            PlayHurtSound();
+        }
+    }
+
+    public void PlayAttackSound()
+    {
+        if (audioSource != null && attackSound != null)
+        {
+            audioSource.PlayOneShot(attackSound);
+        }
+    }
+
+    public void PlayHurtSound()
+    {
+        if (audioSource != null && hurtSound != null)
+        {
+            audioSource.PlayOneShot(hurtSound);
+        }
     }
 
     private void Die()
@@ -100,6 +133,12 @@ public class EnemyHealth : MonoBehaviour
         // Record that this enemy is defeated
         string id = GetUniqueID();
         defeatedEnemies.Add(id);
+
+        // 0. Play death SFX
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.PlayOneShot(deathSound);
+        }
 
         // 1. Play the death animation trigger
         if (animator != null)
