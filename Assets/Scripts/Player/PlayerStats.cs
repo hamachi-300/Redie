@@ -11,6 +11,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private float staminaRegenRate = 10f;
     [SerializeField] private float sprintStaminaDrainRate = 15f;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip hurtSound;
+
     private float currentStamina;
     private bool isDie = false;
 
@@ -28,6 +32,12 @@ public class PlayerStats : MonoBehaviour
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         playerController = GetComponent<PlayerController>();
+
+        // ดึง AudioSource อัตโนมัติหากยังไม่ได้ใส่ใน Inspector
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     public void Heal(float amount)
@@ -39,10 +49,16 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage, bool isInvincible)
     {
-        if (isInvincible) return;
+        if (isInvincible || isDie) return;
 
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0f);
+
+        // เล่นเสียงเจ็บทันทีที่โดนความเสียหาย
+        if (audioSource != null && hurtSound != null)
+        {
+            audioSource.PlayOneShot(hurtSound);
+        }
 
         if (currentHealth <= 0f && !isDie)
         {
