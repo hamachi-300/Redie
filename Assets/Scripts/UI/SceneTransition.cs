@@ -20,6 +20,14 @@ public class SceneTransition : MonoBehaviour
         // If player is inside the trigger zone and presses E, teleport!
         if (isPlayerInside && Input.GetKeyDown(KeyCode.E))
         {
+            // Check if there is an active boss in the scene
+            BossController boss = FindObjectOfType<BossController>();
+            if (boss != null && boss.IsAwake() && !boss.IsDead())
+            {
+                Debug.LogWarning("Teleport blocked: Boss is active!");
+                return; // Block the teleportation
+            }
+
             Teleport();
         }
     }
@@ -66,8 +74,19 @@ public class SceneTransition : MonoBehaviour
             style.normal.textColor = Color.white;
             style.alignment = TextAnchor.MiddleCenter;
 
-            GUI.Label(new Rect(Screen.width / 2 - 150, Screen.height - 100, 300, 50), 
-                      "Press 'E' to " + Press_E_to, style);
+            // Check if the boss is currently active
+            BossController boss = FindObjectOfType<BossController>();
+            bool isBossActive = boss != null && boss.IsAwake() && !boss.IsDead();
+
+            string promptText = "Press 'E' to " + Press_E_to;
+            if (isBossActive)
+            {
+                promptText = "Escape portal is BLOCKED during Boss Fight!";
+                style.normal.textColor = Color.red; // Warn the player in red
+            }
+
+            GUI.Label(new Rect(Screen.width / 2 - 250, Screen.height - 100, 500, 50), 
+                      promptText, style);
         }
     }
 }

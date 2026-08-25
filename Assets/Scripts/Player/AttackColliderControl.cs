@@ -55,6 +55,40 @@ public class AttackColliderControl : MonoBehaviour
                 enemyHealth.TakeDamage(damage);
             }
         }
+
+        if (other.CompareTag("Boss"))
+        {
+            // Prevent hitting the same enemy multiple times in a single swing frame
+            if (alreadyHitTargets.Contains(other)) return;
+            alreadyHitTargets.Add(other);
+
+            // send attack damage to boss
+            BossController bossHealth = other.GetComponent<BossController>();
+
+            if (bossHealth != null && player != null)
+            {
+                // 2. Check if we are currently performing a Heavy Attack
+                bool isHeavy = false;
+                if (player.PlayerAnimator != null)
+                {
+                    isHeavy = player.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsName("HeavyAttack");
+                }
+
+                // 3. Determine and apply damage
+                float damage = 0f;
+                if (player.EquippedWeapon != null)
+                {
+                    damage = isHeavy ? player.EquippedWeapon.heavyAttackDamage : player.EquippedWeapon.lightAttackDamage;
+                }
+                else
+                {
+                    // Default unarmed (fists) damage values when no weapon is equipped
+                    damage = isHeavy ? defaultHeavyDamage : defaultLightDamage;
+                }
+
+                bossHealth.TakeDamage(damage);
+            }
+        }
     }
 
     public void ResetHitbox()
