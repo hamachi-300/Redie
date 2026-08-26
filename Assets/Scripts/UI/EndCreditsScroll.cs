@@ -39,7 +39,7 @@ public class EndCreditsScroll : MonoBehaviour
                              "--- ART & DESIGN ---\n" +
                              "Pluem & his AI friend\n\n\n\n\n" +
                              "--- SOUND & MUSIC ---\n" +
-                             "I don't know ... yet\n\n\n\n\n" +
+                             "Kong\n\n\n\n\n" +
                              "--- THANK FOR PLAYING ---\n\n\n\n\n";
 
             // Force Unity's layout system to calculate the text height immediately on frame 1

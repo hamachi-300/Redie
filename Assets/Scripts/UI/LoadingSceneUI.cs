@@ -17,8 +17,23 @@ public class LoadingSceneUI : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f); // Optional: Give the screen a brief moment to show up
 
+        // 1. ตรวจสอบว่าได้กำหนดชื่อ Scene แล้วหรือยัง
+        if (string.IsNullOrEmpty(LoadingManager.targetSceneName))
+        {
+            Debug.LogError("[LoadingSceneUI] ไม่พบชื่อ Scene ที่ต้องการโหลด! (targetSceneName เป็นค่าว่าง)");
+            yield break; // หยุดการทำงานทันที ป้องกัน NullReferenceException
+        }
+
         // Load the target scene in the background
         AsyncOperation operation = SceneManager.LoadSceneAsync(LoadingManager.targetSceneName);
+
+        // 2. ตรวจสอบว่า AsyncOperation สร้างสำเร็จหรือไม่ (เช่น พิมพ์ชื่อ Scene ผิด หรือไม่ได้ใส่ใน Build Settings)
+        if (operation == null)
+        {
+            Debug.LogError($"[LoadingSceneUI] ไม่สามารถโหลด Scene '{LoadingManager.targetSceneName}' ได้! กรุณาเช็คว่าใส่ชื่อถูกและเพิ่มใน Build Settings แล้วหรือยัง");
+            yield break; // หยุดการทำงานทันที
+        }
+
         operation.allowSceneActivation = false; // Prevent switching until it is 100% loaded
 
         while (!operation.isDone)

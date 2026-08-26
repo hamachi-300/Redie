@@ -11,6 +11,10 @@ public class SceneNameShow : MonoBehaviour
     [SerializeField] private float showTime = 3.0f;
     [SerializeField] private float fadeOutTime = 1.0f;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip sceneNameSound;
+
     // subscribe OnSceneLoaded in order to use OnSceneLoaded function
     private void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -34,6 +38,12 @@ public class SceneNameShow : MonoBehaviour
 
         // wait for 1 second
         yield return new WaitForSeconds(1.0f);
+
+        // Play the sound after the 1-second delay
+        if (audioSource != null && sceneNameSound != null)
+        {
+            audioSource.PlayOneShot(sceneNameSound);
+        }
 
         textComponent.text = sceneName;
         // fade in 

@@ -27,6 +27,18 @@ public class PlayerController : MonoBehaviour
     [Header("Heavy Attack Settings")]
     [SerializeField] private float heavyAttackHoldTime = 1f;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip attackSound;
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip rollSound;
+    [SerializeField] private AudioClip walkSound;
+    [SerializeField] private AudioClip runSound;
+    [SerializeField] private AudioClip deathSound;
+    [SerializeField] private AudioClip deathSoundScreen;
+    [SerializeField] private float walkStepInterval = 0.4f; // ระยะห่างก้าวตอนเดิน (วินาที)
+    [SerializeField] private float runStepInterval = 0.25f; // ระยะห่างก้าวตอนวิ่ง (วินาที)
+
     [Header("Player Visual Root")]
     [SerializeField] private Transform playerVisual;
 
@@ -38,6 +50,7 @@ public class PlayerController : MonoBehaviour
     private float height = 0f;
     private float verticalVelocity = 0f;
     private float remainHAHT;
+    private float stepTimer = 0f;
     private bool isGrounded = true;
     private bool isChargingHeavy = false;
     private bool isRolling = false;
@@ -65,6 +78,12 @@ public class PlayerController : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         
+        // Find AudioSource component if not assigned
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
         // Find or dynamically add the stats component to prevent null reference issues
         stats = GetComponent<PlayerStats>();
         if (stats == null)
@@ -131,11 +150,12 @@ public class PlayerController : MonoBehaviour
         float moveY = Input.GetAxisRaw("Vertical");
 
         Vector2 moveDirection = new Vector2(moveX, moveY);
+        bool isMoving = (moveDirection.sqrMagnitude > 0.01f);
+        bool isSprinting = false;
 
         // Movement
         if (!isRolling)
         {
-            bool isMoving = (moveDirection.sqrMagnitude > 0.01f);
             bool wantsToSprint = Input.GetKey(KeyCode.LeftShift);
 
             if (isMoving) 
@@ -153,6 +173,7 @@ public class PlayerController : MonoBehaviour
             bool hasStaminaToSprint = (stats.CurrentStamina > stats.SprintStaminaDrainRate * Time.deltaTime);
             if (wantsToSprint && isMoving && hasStaminaToSprint && isGrounded)
             {
+                isSprinting = true;
                 currentSpeed = runSpeed;
                 animator.SetFloat("WalkAnimSpeed", 1f);
                 stats.DrainSprintStamina(); // Drain stamina inside stats
@@ -167,9 +188,12 @@ public class PlayerController : MonoBehaviour
             if (rb2d != null) { rb2d.velocity = moveDirection * currentSpeed; }
         }
 
+        // Footstep Audio Handling
+        HandleFootsteps(isMoving, isSprinting);
+
         // Regenerate stamina (only if not currently sprinting)
-        bool isSprinting = Input.GetKey(KeyCode.LeftShift) && (moveDirection.sqrMagnitude > 0.01f) && (stats.CurrentStamina > 0f);
-        stats.RegenerateStamina(isSprinting);
+        bool isSprintingStaminaRegen = Input.GetKey(KeyCode.LeftShift) && isMoving && (stats.CurrentStamina > 0f);
+        stats.RegenerateStamina(isSprintingStaminaRegen);
 
         // Get direction of player facing
         float facingX = animator.GetFloat("MoveX");
@@ -206,6 +230,7 @@ public class PlayerController : MonoBehaviour
                     if (hitbox != null) hitbox.ResetHitbox();
                     animator.SetTrigger("LightAttack");
                     verticalVelocity -= 8f; 
+                    PlayAttackSound();
                 }
                 if (isChargingHeavy)
                 {
@@ -226,6 +251,7 @@ public class PlayerController : MonoBehaviour
 
                         animator.SetBool("IsChargingHeavy", false);
                         animator.SetTrigger("HeavyAttack");
+                        PlayAttackSound();
                     }
                     else
                     {
@@ -244,6 +270,7 @@ public class PlayerController : MonoBehaviour
                         if (hitbox != null) hitbox.ResetHitbox();
 
                         animator.SetTrigger("LightAttack");
+                        PlayAttackSound();
                     }
                     else
                     {
@@ -263,6 +290,7 @@ public class PlayerController : MonoBehaviour
 
             animator.SetFloat("JumpAnimSpeed", clipLength / airTime);
             animator.SetBool("IsJumping", true);
+            PlayJumpSound();
         }
 
         if (!isGrounded)
@@ -291,7 +319,83 @@ public class PlayerController : MonoBehaviour
             if (rollDirection == Vector2.zero) rollDirection = Vector2.down;
 
             animator.SetTrigger("Roll");
+            PlayRollSound();
             StartCoroutine(PerformRoll());
+        }
+    }
+
+    private void HandleFootsteps(bool isMoving, bool isSprinting)
+    {
+        if (isMoving && isGrounded && !isRolling)
+        {
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f)
+            {
+                AudioClip clipToPlay = isSprinting ? (runSound != null ? runSound : walkSound) : walkSound;
+                if (audioSource != null && clipToPlay != null)
+                {
+                    // เปลี่ยนจาก PlayOneShot มาเป็นการใส่ clip แล้ว Play
+                    // ช่วยให้ก้าวใหม่เล่นแทนที่ก้าวเก่าทันที ไม่ก้องหรือสะสมเสียง
+                    audioSource.clip = clipToPlay;
+                    audioSource.Play();
+                }
+                
+                stepTimer = isSprinting ? runStepInterval : walkStepInterval;
+            }
+        }
+        else
+        {
+            // หยุดเล่นเสียงเฉพาะเมื่อเสียงที่เล่นอยู่ปัจจุบันคือเสียงเดินหรือวิ่ง
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                if (audioSource.clip == walkSound || audioSource.clip == runSound)
+                {
+                    audioSource.Stop();
+                }
+            }
+            stepTimer = 0f;
+        }
+    }
+
+    public void PlayAttackSound()
+    {
+        if (audioSource != null && attackSound != null)
+        {
+            audioSource.PlayOneShot(attackSound);
+        }
+    }
+
+    public void PlayJumpSound()
+    {
+        if (audioSource != null && jumpSound != null)
+        {
+            audioSource.PlayOneShot(jumpSound);
+        }
+    }
+
+    public void PlayRollSound()
+    {
+        if (audioSource != null && rollSound != null)
+        {
+            audioSource.PlayOneShot(rollSound);
+        }
+    }
+
+    public void PlayDeathSound()
+    {
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.volume = 1.0f; // Force AudioSource volume to 100%
+            audioSource.PlayOneShot(deathSound, 1.0f); // Force PlayOneShot to play at max volume
+        }
+    }
+
+    public void PlayDeathSoundScreen()
+    {
+        if (audioSource != null && deathSoundScreen != null)
+        {
+            audioSource.volume = 1.0f; // Force AudioSource volume to 100%
+            audioSource.PlayOneShot(deathSoundScreen, 1.0f); // Force PlayOneShot to play at max volume
         }
     }
 
@@ -353,15 +457,17 @@ public class PlayerController : MonoBehaviour
         stats.Heal(amount);
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, bool isInvincible = false)
     {
-        stats.TakeDamage(damage, isRolling);
+        stats.TakeDamage(damage, isInvincible);
     }
 
     public void Die()
     {
         isDie = true;
         animator.SetTrigger("Die");
+        PlayDeathSound();
+        PlayDeathSoundScreen();
         
         // Show the Game Over screen if it exists in the scene
         if (GameOverUI.Instance != null)
