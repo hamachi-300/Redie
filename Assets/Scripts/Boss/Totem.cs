@@ -16,12 +16,14 @@ public class Totem : MonoBehaviour
 
     private Animator animator;
     private GameObject player;
-    private bool hasActivated = false;
+    private AudioSource audioSource;
+    private bool hasActivated = false; // Tracks if the fire has been lit
 
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
         player = GameObject.FindGameObjectWithTag("Player");
+        audioSource = GetComponent<AudioSource>();
 
         if (boss == null)
         {
@@ -31,19 +33,20 @@ public class Totem : MonoBehaviour
 
     private void Update()
     {
-        // 1. If boss dies, turn off the Lit boolean and stop checks
+        // 1. If boss dies, extinguish the fire (Lit = false), stop sound, and shut down
         if (boss != null && boss.IsDead())
         {
             if (animator != null && !string.IsNullOrEmpty(animationBoolName))
             {
                 animator.SetBool(animationBoolName, false);
             }
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
             this.enabled = false; // Disable script completely since boss is dead
             return;
         }
-
-        // 2. If already activated and boss is still alive, do nothing
-        if (hasActivated) return;
 
         if (player == null)
         {
@@ -51,19 +54,45 @@ public class Totem : MonoBehaviour
             return;
         }
 
-        // 3. Calculate distance strictly on Y-axis
+        // 2. Calculate distance strictly on the Y-axis
         float distanceY = Mathf.Abs(transform.position.y - player.transform.position.y);
         bool isPlayerInRange = distanceY <= detectionRange;
 
-        // 4. Activate totem (set Lit to true) when player enters vertical range
-        if (isPlayerInRange)
+        // 3. Ignite fire (one-time activation)
+        if (isPlayerInRange && !hasActivated)
         {
             if (animator != null && !string.IsNullOrEmpty(animationBoolName))
             {
-                animator.SetBool(animationBoolName, true);
+                animator.SetBool(animationBoolName, true); // Keep fire lit permanently
             }
-
             hasActivated = true;
+        }
+
+        // 4. Dynamic Audio Fading (Only works if the fire has already been lit!)
+        if (hasActivated)
+        {
+            if (isPlayerInRange)
+            {
+                if (audioSource != null)
+                {
+                    if (!audioSource.isPlaying)
+                    {
+                        audioSource.Play();
+                    }
+
+                    // Smooth Y-distance volume fading
+                    float volumeRatio = 1f - (distanceY / detectionRange);
+                    audioSource.volume = Mathf.Clamp01(volumeRatio);
+                }
+            }
+            else
+            {
+                // Stop sound when player is out of range, but keep fire burning!
+                if (audioSource != null && audioSource.isPlaying)
+                {
+                    audioSource.Stop();
+                }
+            }
         }
     }
 }

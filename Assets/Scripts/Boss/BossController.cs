@@ -48,6 +48,12 @@ public class BossController : MonoBehaviour
     [Header("Jump Attack Effects")]
     [SerializeField] private string jumpImpactTriggerName = "Slam";
 
+    [Header("Attack Audio Clips")]
+    [SerializeField] private AudioClip sweepSound;
+    [SerializeField] private AudioClip stabSound;
+    [SerializeField] private AudioClip jumpUpSound;
+    [SerializeField] private AudioClip jumpDownSound;
+
     private float sleepTime = 3f;
     private float visibleRange = 10f;
 
@@ -66,6 +72,7 @@ public class BossController : MonoBehaviour
     private GameObject player;
     private Rigidbody2D rb2d;
     private Collider2D myCollider;
+    private AudioSource audioSource;
     
 
     private IEnumerator Start()
@@ -75,6 +82,7 @@ public class BossController : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         rb2d = GetComponent<Rigidbody2D>();
         myCollider = GetComponentInChildren<Collider2D>();
+        audioSource = GetComponent<AudioSource>();
 
         // boss see player then awake from coffin
         while (player == null || Vector3.Distance(transform.position, player.transform.position) > visibleRange)
@@ -105,6 +113,10 @@ public class BossController : MonoBehaviour
         // Smoothly increase HP from 0 to maxHp (Combat Intro fill-up)
         float fillDuration = 1.5f; // Fills up over 1.5 seconds
         float timer = 0f;
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
         while (timer < fillDuration)
         {
             timer += Time.deltaTime;
@@ -128,8 +140,32 @@ public class BossController : MonoBehaviour
 
         if (hp <= 0)
         {
-            animator.SetTrigger("Die");
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                StartCoroutine(FadeOutAudio(2f)); // Smoothly fade out music over 2 seconds
+            }
+
+            if (animator != null)
+            {
+                // Reset all action parameters to avoid visual conflicts
+                animator.SetBool("ChargeStabAttack", false);
+                animator.SetBool("StabAttack", false);
+                animator.SetBool("JumpUp", false);
+                animator.SetBool("JumpDown", false);
+                animator.SetBool("IsMoving", false);
+
+                // Force play the death state directly to bypass missing Animator transitions
+                animator.Play("Die");
+                animator.SetTrigger("Die"); // Fallback trigger
+            }
+
             isDie = true;
+
+            // Trigger the jumpscare sequence!
+            if (JumpScare.Instance != null)
+            {
+                JumpScare.Instance.TriggerJumpScare();
+            }
         }
 
         float playerDistance = Vector3.Distance(transform.position, player.transform.position);
@@ -139,6 +175,12 @@ public class BossController : MonoBehaviour
             sweepingAttackColdownRemain = 0;
             attackTimer -= sweepingAttackTimer;
             StartCoroutine(DealSweepDamage()); // Trigger sweep damage check
+            
+            // Play sweeping attack sound!
+            if (audioSource != null && sweepSound != null)
+            {
+                audioSource.PlayOneShot(sweepSound);
+            }
         } else {
             sweepingAttackColdownRemain += Time.deltaTime;
         }
@@ -167,6 +209,12 @@ public class BossController : MonoBehaviour
             {
                 jumpTargetPosition = player.transform.position;
             }
+
+            // Play jump up sound!
+            if (audioSource != null && jumpUpSound != null)
+            {
+                audioSource.PlayOneShot(jumpUpSound);
+            }
         } else {
             jumpAttackColdownRemain += Time.deltaTime;
         }
@@ -194,6 +242,12 @@ public class BossController : MonoBehaviour
                     {
                         stabHitbox.SetDamage(stabbingDamage);
                         stabHitbox.EnableHitbox();
+                    }
+
+                    // Play stab dash sound!
+                    if (audioSource != null && stabSound != null)
+                    {
+                        audioSource.PlayOneShot(stabSound);
                     }
                 }
             }
@@ -249,6 +303,12 @@ public class BossController : MonoBehaviour
                     jumpPhase = 2;
                     animator.SetBool("JumpUp", false);
                     animator.SetBool("JumpDown", true);
+
+                    // Play jump slam down sound!
+                    if (audioSource != null && jumpDownSound != null)
+                    {
+                        audioSource.PlayOneShot(jumpDownSound);
+                    }
                 }
             }
             else if (jumpPhase == 2) // Phase 2: Jump Down (Landing)
@@ -328,6 +388,24 @@ public class BossController : MonoBehaviour
         {
             jumpHitbox.DisableHitbox();
         }
+    }
+
+    private IEnumerator FadeOutAudio(float duration)
+    {
+        if (audioSource == null) yield break;
+
+        float startVolume = audioSource.volume;
+        float timer = 0f;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(startVolume, 0f, timer / duration);
+            yield return null;
+        }
+
+        audioSource.Stop();
+        audioSource.volume = startVolume; // Reset volume back for future playbacks
     }
 
     public float GetHp() => hp;
