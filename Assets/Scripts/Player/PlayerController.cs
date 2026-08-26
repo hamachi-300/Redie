@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip rollSound;
     [SerializeField] private AudioClip walkSound;
     [SerializeField] private AudioClip runSound;
-    [SerializeField] private AudioClip deathSound; // เพิ่มช่องใส่ไฟล์เสียงตอนตาย
+    [SerializeField] private AudioClip deathSound;
     [SerializeField] private float walkStepInterval = 0.4f; // ระยะห่างก้าวตอนเดิน (วินาที)
     [SerializeField] private float runStepInterval = 0.25f; // ระยะห่างก้าวตอนวิ่ง (วินาที)
 
@@ -333,7 +333,10 @@ public class PlayerController : MonoBehaviour
                 AudioClip clipToPlay = isSprinting ? (runSound != null ? runSound : walkSound) : walkSound;
                 if (audioSource != null && clipToPlay != null)
                 {
-                    audioSource.PlayOneShot(clipToPlay);
+                    // เปลี่ยนจาก PlayOneShot มาเป็นการใส่ clip แล้ว Play
+                    // ช่วยให้ก้าวใหม่เล่นแทนที่ก้าวเก่าทันที ไม่ก้องหรือสะสมเสียง
+                    audioSource.clip = clipToPlay;
+                    audioSource.Play();
                 }
                 
                 stepTimer = isSprinting ? runStepInterval : walkStepInterval;
@@ -341,7 +344,15 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            stepTimer = 0f; // Reset ให้พร้อมเล่นเสียงทันทีเมื่อเริ่มก้าวเดินใหม่
+            // หยุดเล่นเสียงเฉพาะเมื่อเสียงที่เล่นอยู่ปัจจุบันคือเสียงเดินหรือวิ่ง
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                if (audioSource.clip == walkSound || audioSource.clip == runSound)
+                {
+                    audioSource.Stop();
+                }
+            }
+            stepTimer = 0f;
         }
     }
 
@@ -444,7 +455,7 @@ public class PlayerController : MonoBehaviour
     {
         isDie = true;
         animator.SetTrigger("Die");
-        PlayDeathSound(); // เรียกใช้เสียงตอนตาย
+        PlayDeathSound();
         
         // Show the Game Over screen if it exists in the scene
         if (GameOverUI.Instance != null)
