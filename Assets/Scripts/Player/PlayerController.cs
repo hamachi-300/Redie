@@ -448,7 +448,6 @@ public class PlayerController : MonoBehaviour
         if (weaponVisualRenderer != null)
         {
             weaponVisualRenderer.sprite = null;
-            weaponVisualRenderer.gameObject.SetActive(false); // Hide the weapon visual
         }
 
         if (animator != null && baseAnimatorController != null)
