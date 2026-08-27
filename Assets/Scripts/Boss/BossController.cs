@@ -82,8 +82,8 @@ public class BossController : MonoBehaviour
         myCollider = GetComponentInChildren<Collider2D>();
         audioSource = GetComponent<AudioSource>();
 
-        // boss see player then awake from coffin
-        while (player == null || Vector3.Distance(transform.position, player.transform.position) > visibleRange)
+        // boss see player then awake from coffin (or if player walks past/above the boss's Y position)
+        while (player == null || (Vector3.Distance(transform.position, player.transform.position) > visibleRange && player.transform.position.y < transform.position.y))
         {
             if (player == null)
             {
