@@ -55,11 +55,12 @@ public class BossController : MonoBehaviour
     private float sleepTime = 3f;
     private float visibleRange = 10f;
 
-    private float maxHp = 300f;
+    private float maxHp = 3f;
     private float hp = 0;
 
     private bool isDie = false;
     private bool isSleeping = true;
+    private bool isGoingToAwake = false;
 
     [Header("Attack Hitboxes")]
     [SerializeField] private EnemyAttackHitbox sweepHitbox;
@@ -94,6 +95,7 @@ public class BossController : MonoBehaviour
         }
 
         // awake from coffin when player in visible range
+        isGoingToAwake = true;
         yield return new WaitForSeconds(sleepTime);
         if (animator != null)
         {
@@ -406,7 +408,7 @@ public class BossController : MonoBehaviour
 
     public float GetHp() => hp;
     public float GetMaxHp() => maxHp;
-    public bool IsAwake() => !isSleeping;
+    public bool IsAwake() => isGoingToAwake;
     public bool IsDead() => isDie;
 
 }
