@@ -55,7 +55,7 @@ public class BossController : MonoBehaviour
     private float sleepTime = 3f;
     private float visibleRange = 10f;
 
-    private float maxHp = 3f;
+    private float maxHp = 300f;
     private float hp = 0;
 
     private bool isDie = false;
