@@ -2692,7 +2692,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuPanel: {fileID: 2193920860464108852}
-  hintPanel: {fileID: 0}
   tabPanels:
   - {fileID: 2193920860976196002}
   - {fileID: 2193920861316170362}
@@ -4507,6 +4506,7 @@ GameObject:
   - component: {fileID: 1625882533892104145}
   - component: {fileID: 7056805831233493686}
   - component: {fileID: 5173271906022383708}
+  - component: {fileID: 3409284338013774597}
   m_Layer: 5
   m_Name: HintUI
   m_TagString: Untagged
@@ -4596,6 +4596,19 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &3409284338013774597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6148291432029788454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8739e1630abaaf34683a547371eefba5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hintPanel: {fileID: 4322805381927967540}
 --- !u!1 &6277266219983360550
 GameObject:
   m_ObjectHideFlags: 0

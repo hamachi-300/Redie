@@ -8,9 +8,6 @@ public class MenuWindowUI : MonoBehaviour
     [Header("Main Menu Panel")]
     [SerializeField] private GameObject menuPanel;
 
-    [Header("Hint Panel")]
-    [SerializeField] private GameObject hintPanel;
-
     [Header("Sub-Tab Panels (In Order: 0=Status, 1=Inventory, 2=Settings)")]
     [SerializeField] private GameObject[] tabPanels;
 
@@ -41,11 +38,6 @@ public class MenuWindowUI : MonoBehaviour
             IsOpen = false;
         }
 
-        if (hintPanel != null)
-        {
-            hintPanel.SetActive(true);
-        }
-
         if (exitToMenuButton != null)
         {
             exitToMenuButton.onClick.AddListener(ExitToMainMenu);
@@ -69,11 +61,6 @@ public class MenuWindowUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             ToggleMenu();
-        }
-
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            ToggleHint();
         }
 
         if (IsOpen)
@@ -105,12 +92,6 @@ public class MenuWindowUI : MonoBehaviour
             SelectTab(currentTabIndex);
             RefreshInventoryUI();
         }
-    }
-
-    private void ToggleHint() {
-        if (hintPanel == null) return;
-        bool newState = !hintPanel.activeSelf;
-        hintPanel.SetActive(newState);
     }
 
     public void SelectTab(int tabIndex)
