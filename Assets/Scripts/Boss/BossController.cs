@@ -25,7 +25,6 @@ public class BossController : MonoBehaviour
     private float dashTimer = 0f;
     private float maxDashDuration = 0.5f; // limit dash time for prevent bug with collider
     private float stabbingDamage = 20f;
-    private bool hasHitThisDash = false;
 
     private float speed = 2.5f;
     private float stoppingDistance = 2f; 
@@ -35,7 +34,6 @@ public class BossController : MonoBehaviour
     private float jumpAttackColdownRemain = 0f;
     private bool isJumping = false;
     private int jumpPhase = 0; // 0 = none, 1 = jump up, 2 = jump down
-    private float jumpTimer = 0f;
     [SerializeField] private float jumpHeight = 10f;         // Max height (increase this to jump higher!)
     [SerializeField] private float jumpRiseSpeed = 12f;       // Vertical rising speed
     [SerializeField] private float jumpFallSpeed = 20f;       // Vertical falling speed
@@ -202,7 +200,6 @@ public class BossController : MonoBehaviour
             isJumping = true;
             if (myCollider != null) myCollider.enabled = false; // Disable collider to fly through obstacles/walls
             jumpPhase = 1;
-            jumpTimer = 0f;
             currentJumpHeight = 0f; // Reset current height
             jumpStartPosition = transform.position;
             if (player != null)
@@ -235,7 +232,6 @@ public class BossController : MonoBehaviour
                     isDashing = true;
                     dashTargetPosition = player.transform.position;
                     dashTimer = 0f; // Reset safety timer when starting the dash
-                    hasHitThisDash = false; // Reset hit flag for this new dash
 
                     // Enable the stab dash trigger hitbox!
                     if (stabHitbox != null)

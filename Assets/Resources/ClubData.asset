@@ -20,4 +20,4 @@ MonoBehaviour:
   staminaCostLight: 10
   staminaCostHeavy: 20
   lightAttackDamage: 15
-  heavyAttackDamage: 35
+  heavyAttackDamage: 40

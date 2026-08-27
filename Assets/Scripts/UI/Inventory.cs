@@ -55,6 +55,16 @@ public class Inventory : MonoBehaviour
         RefreshUIIfOpen();
     }
 
+    public static void ClearPersistentItems()
+    {
+        persistentItems.Clear();
+        if (Instance != null)
+        {
+            Instance.ownedItems.Clear();
+            Instance.RefreshUIIfOpen();
+        }
+    }
+
     private void RefreshUIIfOpen()
     {
         MenuWindowUI menu = FindObjectOfType<MenuWindowUI>();

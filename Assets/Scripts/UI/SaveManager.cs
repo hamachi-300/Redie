@@ -137,6 +137,7 @@ public class SaveManager : MonoBehaviour
         }
         ItemPickup.ClearPickedUpItems();
         EnemyHealth.ClearDefeatedEnemies();
+        Inventory.ClearPersistentItems(); // Clear inventory on starting a new game
     }
 
     public void InitiateLoadGame()

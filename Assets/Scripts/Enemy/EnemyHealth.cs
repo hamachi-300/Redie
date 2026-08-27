@@ -171,4 +171,7 @@ public class EnemyHealth : MonoBehaviour
             Destroy(gameObject, deathDelay);
         }
     }
+
+    public float GetHealth() => currentHealth;
+    public float GetMaxHealth() => maxHealth;
 }

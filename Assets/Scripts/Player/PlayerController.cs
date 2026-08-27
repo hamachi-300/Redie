@@ -415,6 +415,7 @@ public class PlayerController : MonoBehaviour
         // Swap the sprite
         if (weaponVisualRenderer != null)
         {
+            weaponVisualRenderer.gameObject.SetActive(true);
             weaponVisualRenderer.sprite = newWeapon.itemSprite;
             weaponVisualRenderer.transform.localScale = newWeapon.localScale;
         }
@@ -429,7 +430,15 @@ public class PlayerController : MonoBehaviour
         staminaCostLightAttack = newWeapon.staminaCostLight;
         staminaCostHeavyAttack = newWeapon.staminaCostHeavy;
 
-        Debug.Log("Equipped: " + newWeapon.itemName);
+        // Get full path of this player GameObject to detect duplicates
+        string playerPath = gameObject.name;
+        Transform parentTrans = transform.parent;
+        while (parentTrans != null)
+        {
+            playerPath = parentTrans.name + "/" + playerPath;
+            parentTrans = parentTrans.parent;
+        }
+        Debug.Log("Equipped: " + newWeapon.itemName + " on player GameObject path: " + playerPath);
     }
 
     public void UnequipWeapon()
@@ -439,6 +448,7 @@ public class PlayerController : MonoBehaviour
         if (weaponVisualRenderer != null)
         {
             weaponVisualRenderer.sprite = null;
+            weaponVisualRenderer.gameObject.SetActive(false); // Hide the weapon visual
         }
 
         if (animator != null && baseAnimatorController != null)
@@ -505,6 +515,12 @@ public class PlayerController : MonoBehaviour
             {
                 col.offset = new Vector2(col.offset.x, height);
             }
+        }
+
+        // Force-prevent Animator from resetting the weapon visual sprite back to None!
+        if (equippedWeapon != null && weaponVisualRenderer != null && weaponVisualRenderer.sprite != equippedWeapon.itemSprite)
+        {
+            weaponVisualRenderer.sprite = equippedWeapon.itemSprite;
         }
     }
 }

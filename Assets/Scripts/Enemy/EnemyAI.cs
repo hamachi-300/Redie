@@ -27,6 +27,9 @@ public class EnemyAI : MonoBehaviour
     [Header("Attack Hitbox Reference")]
     [SerializeField] private EnemyAttackHitbox attackHitbox;
 
+    [Header("Enemy Health Reference")]
+    [SerializeField] private EnemyHealthBar healthBar;
+
     private float nextAttackTime = 0f;
     private bool isAttacking = false;
     private bool isFoundPlayer = false;
@@ -81,6 +84,9 @@ public class EnemyAI : MonoBehaviour
         // 3. Shoot a raycast to check for solid obstacles between enemy and player
         if (isInSignRange)
         {
+            if (healthBar != null) {
+                healthBar.SetVisible();
+            }
             Vector2 directionToPlayer = (playerTransform.position - transform.position).normalized;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, distance, obstacleLayer);
 
@@ -88,6 +94,10 @@ public class EnemyAI : MonoBehaviour
             if (hit.collider == null)
             {
                 hasLineOfSight = true;
+            }
+        } else {
+            if (healthBar != null) {
+                healthBar.SetInvisible();
             }
         }
 
